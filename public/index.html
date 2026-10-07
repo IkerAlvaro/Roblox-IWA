@@ -106,7 +106,7 @@ footer{padding:10px 16px;color:var(--muted);font-size:11px;border-top:1px solid 
     </div>
     <div class="footer">
       <div id="lock-footer-default">Protegido · Murcia · WISP v2</div>
-      <div id="lock-footer-setup" style="display:none"><button id="btn-use-default">Usar código por defecto (1234)</button></div>
+      <div id="lock-footer-setup" style="display:none"><button id="btn-use-default">Usar código por defecto (1999)</button></div>
     </div>
   </div>
 </div>
@@ -191,7 +191,7 @@ footer{padding:10px 16px;color:var(--muted);font-size:11px;border-top:1px solid 
           <button class="btn secondary" id="btn-disable-code" style="flex:1">Desactivar protección</button>
           <button class="btn secondary" id="btn-lock-now" style="flex:1">Bloquear ahora</button>
         </div>
-        <div style="font-size:11px;color:var(--muted);margin-top:8px">Código actual: <span id="code-status">—</span> · Por defecto: 1234</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px">Código actual: <span id="code-status">—</span> · Por defecto: 1999</div>
       </div>
       <div class="field"><label>Servidor WISP — autoconnect al más rápido</label><div class="server-list" id="server-list"><div style="padding:10px;color:var(--muted);font-size:12px">Cargando...</div></div><div style="display:flex;gap:8px;margin-top:10px"><button class="btn secondary" id="btn-test" style="flex:1">Probar</button><button class="btn secondary" id="btn-auto" style="flex:1">Auto</button></div></div>
       <div class="field"><label>Estado</label><div style="background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;font-size:12px;color:var(--muted)" id="settings-status">Iniciando...</div></div>
@@ -208,7 +208,7 @@ footer{padding:10px 16px;color:var(--muted);font-size:11px;border-top:1px solid 
   // ===== SEGURIDAD CON CÓDIGO =====
   var CODE_KEY = 'aula-access-code';
   var CODE_ENABLED_KEY = 'aula-code-enabled';
-  var DEFAULT_CODE = '1234';
+  var DEFAULT_CODE = '1999';
 
   function getStoredCode(){
     try{ return localStorage.getItem(CODE_KEY); }catch(e){ return null; }
@@ -332,7 +332,7 @@ footer{padding:10px 16px;color:var(--muted);font-size:11px;border-top:1px solid 
     if(isSetupMode){
       if(saveCode(DEFAULT_CODE)){
         hideLock();
-        if(gid('status')) gid('status').textContent='Código por defecto (1234) activado';
+        if(gid('status')) gid('status').textContent='Código por defecto (1999) activado';
         setTimeout(function(){ if(window.initWisp) window.initWisp(); }, 300);
       }
     }
@@ -372,7 +372,7 @@ footer{padding:10px 16px;color:var(--muted);font-size:11px;border-top:1px solid 
     if(!codeStatus) return;
     if(!isCodeEnabled()){ codeStatus.textContent='Desactivado'; return; }
     var stored = getStoredCode();
-    codeStatus.textContent = stored ? 'Activo · Personalizado' : 'Activo · Por defecto (1234)';
+    codeStatus.textContent = stored ? 'Activo · Personalizado' : 'Activo · Por defecto (1999)';
   }
 
   if(btnSaveCode) btnSaveCode.addEventListener('click', function(){
