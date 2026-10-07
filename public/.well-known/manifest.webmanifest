@@ -1,15 +1,16 @@
 {
   "id": "/",
-  "version": "1.0.0",
   "name": "Roblox IWA",
   "short_name": "Roblox",
   "description": "Cliente Isolated Web App de Roblox para ChromeOS.",
-  "start_url": "/index.html",
+  "version": "1.0.1",
+  "isolated_storage": true,
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "display_override": ["borderless", "standalone"],
+  "display_override": ["unframed", "standalone"],
   "orientation": "any",
-  "background_color": "#111216",
+  "background_color": "#0b0c10",
   "theme_color": "#e2231a",
   "lang": "es",
   "icons": [
@@ -23,7 +24,7 @@
       "src": "/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable"
     }
   ],
   "launch_handler": {
@@ -31,10 +32,8 @@
   },
   "permissions_policy": {
     "cross-origin-isolated": ["self"],
-    "direct-sockets": ["self"],
     "fullscreen": ["self"],
     "pointer-lock": ["self"],
-    "gamepad": ["self"],
-    "window-management": ["self"]
+    "gamepad": ["self"]
   }
 }

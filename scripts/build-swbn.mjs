@@ -41,9 +41,16 @@ for (const file of walk(pub)) {
   const rel = "/" + path.relative(pub, file).split(path.sep).join("/");
   const body = fs.readFileSync(file);
   const headers = { "Content-Type": types[path.extname(file)] || "application/octet-stream" };
+  if (rel.endsWith("manifest.webmanifest")) {
+    headers["Content-Type"] = "application/manifest+json";
+  }
   builder.addExchange(origin + rel, 200, headers, body);
   if (rel === "/index.html") {
     builder.addExchange(origin + "/", 200, { "Content-Type": "text/html; charset=utf-8" }, body);
+  }
+  if (rel === "/.well-known/manifest.webmanifest") {
+    builder.addExchange(origin + "/manifest.webmanifest", 200, { "Content-Type": "application/manifest+json" }, body);
+    builder.addExchange(origin + "/.well-known/manifest.json", 200, { "Content-Type": "application/manifest+json" }, body);
   }
 }
 
