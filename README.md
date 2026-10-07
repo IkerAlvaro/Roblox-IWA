@@ -2,7 +2,7 @@
 
 Cliente **Isolated Web App** para abrir Roblox como aplicación instalada en Chrome / ChromeOS.
 
-## Qué hace (y qué no)
+## Qué hace:
 
 - Empaqueta una shell IWA (`isolated-app://…`) con UI propia, icono y manifiesto.
 - Carga `https://www.roblox.com` **dentro de la app**, no como pestaña normal.
