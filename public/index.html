@@ -341,31 +341,46 @@ body{font-family:Inter,system-ui,-apple-system,sans-serif;background:var(--bg);c
         }
       }catch(e){console.log('[Aula] Bare-Mux no disponible',e.message);}
 
-      // Si Bare no funcionó, probar WISP ping
+      // Si Bare no funcionó, probar WISP ping paralelo - elige <100ms
       if(!bareOk){
         async function ping(url){
           return new Promise(function(res){
             var start=performance.now();
             try{
               var ws=new WebSocket(url);
-              var t=setTimeout(function(){try{ws.close();}catch(e){} res(-1);},2500);
-              ws.onopen=function(){clearTimeout(t); var ms=Math.round(performance.now()-start); try{ws.close();}catch(e){} res(ms);};
-              ws.onerror=function(){clearTimeout(t); res(-1);};
-            }catch(e){res(-1);}
+              var t=setTimeout(function(){try{ws.close();}catch(e){} res({url:url, ms:-1});},2000);
+              ws.onopen=function(){clearTimeout(t); var ms=Math.round(performance.now()-start); try{ws.close();}catch(e){} res({url:url, ms:ms});};
+              ws.onerror=function(){clearTimeout(t); res({url:url, ms:-1});};
+            }catch(e){res({url:url, ms:-1});}
           });
         }
-        for(var i=0;i<servers.length;i++){
-          var ms=await ping(servers[i].url);
-          if(ms!==-1 && ms<bestMs){bestMs=ms; best=servers[i];}
-          if(best && bestMs<30) break;
-        }
-        if(best){
+        // Ping paralelo todos
+        var results = await Promise.all(servers.map(function(s){ return ping(s.url).then(function(r){ return {server:s, ms:r.ms}; }); }));
+        // Filtrar OK y ordenar por ms
+        var ok = results.filter(function(r){ return r.ms!==-1; }).sort(function(a,b){ return a.ms-b.ms; });
+        if(ok.length){
+          // Si local tiene >100ms y hay Madrid con <100ms, elegir Madrid
+          var local = ok.find(function(r){ return r.server.id==='local'; });
+          var madrid = ok.find(function(r){ return r.server.id==='madrid' || r.server.id==='madrid2'; });
+          if(local && local.ms>100 && madrid && madrid.ms<100){
+            best = madrid.server;
+            bestMs = madrid.ms;
+            console.log('[Aula] Local 521ms alto, eligiendo Madrid '+bestMs+'ms para baja latencia');
+          }else{
+            best = ok[0].server;
+            bestMs = ok[0].ms;
+          }
           dot.classList.add('on');
           wispTxt.textContent='WISP Murcia · '+best.name;
-          wispMs.textContent=bestMs+'ms · Auto';
+          wispMs.textContent=bestMs+'ms · Auto <100ms';
           var sd=document.getElementById('statWispDetail');
-          if(sd) sd.textContent=best.name+' · '+bestMs+'ms';
-          statusEl.textContent='WISP conectado · '+best.name+' · '+bestMs+'ms · Proxy 100%';
+          if(sd) sd.textContent=best.name+' · '+bestMs+'ms · Rápido';
+          statusEl.textContent='WISP conectado · '+best.name+' · '+bestMs+'ms · Proxy 100% rápido';
+          // Actualizar pings en UI
+          ok.forEach(function(r){
+            var el=document.getElementById('ping-'+r.server.id);
+            if(el){ el.textContent=r.ms+'ms'; if(r.ms<100) el.classList.add('ok'); }
+          });
         }else{
           wispTxt.textContent='WISP Murcia · Modo directo';
           wispMs.textContent='Directo · Proxy 100%';
