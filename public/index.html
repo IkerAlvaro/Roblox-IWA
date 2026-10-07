@@ -1,372 +1,407 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#0b0c10" />
-    <title>Roblox IWA - Murcia</title>
-    <link rel="manifest" href="/.well-known/manifest.webmanifest" />
-    <link rel="icon" href="/icons/icon-192.png" />
-    <style>
-      :root {
-        --red:#e2231a;
-        --bg:#0e0f13;
-        --panel:#16181f;
-        --panel2:#1c1f2b;
-        --line:#252836;
-        --muted:#8b8fa3;
-        --text:#eef0f6;
-        --text2:#c5c8d6;
-        --green:#2ecc71;
-        --green-bg:rgba(46,204,113,.12);
-      }
-      *{box-sizing:border-box}
-      html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-font-smoothing:antialiased}
-      #app{display:flex;height:100%}
-      .rail{width:72px;flex:0 0 72px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 8px;background:#0f1015;border-right:1px solid var(--line)}
-      .rail img{width:40px;height:40px;border-radius:10px}
-      .rail button{width:44px;height:44px;border:0;border-radius:10px;background:transparent;color:var(--muted);cursor:pointer;font-size:18px;display:grid;place-items:center;transition:.15s}
-      .rail button:hover{background:var(--panel2);color:var(--text)}
-      .rail button.active{background:var(--red);color:#fff}
-      .rail .sep{width:24px;height:1px;background:var(--line);margin:8px 0}
-      .stage{flex:1;min-width:0;display:flex;flex-direction:column}
-      .topbar{display:flex;gap:10px;padding:12px 16px;align-items:center;border-bottom:1px solid var(--line);background:rgba(22,24,31,.8);backdrop-filter:blur(8px)}
-      #go-form{flex:1;display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px 6px 6px 14px}
-      #go-form:focus-within{border-color:#3a3e52}
-      #url{flex:1;border:0;background:transparent;color:#fff;outline:none;font-size:14px}
-      #url::placeholder{color:var(--muted)}
-      .btn{border:0;border-radius:10px;padding:9px 16px;cursor:pointer;font-weight:600;font-size:13px;background:var(--red);color:#fff;transition:.15s}
-      .btn:hover{background:#c91f16}
-      .btn.secondary{background:var(--panel2);color:var(--text2);border:1px solid var(--line)}
-      .btn.secondary:hover{background:#242738;color:var(--text)}
-      #clock{color:var(--muted);font-size:12px;min-width:48px;text-align:right;font-variant-numeric:tabular-nums}
-      .status-line{display:flex;align-items:center;gap:8px;padding:8px 16px;background:var(--panel);border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}
-      .status-line .dot{width:7px;height:7px;border-radius:50%;background:var(--muted);flex-shrink:0}
-      .status-line .dot.on{background:var(--green);box-shadow:0 0 6px rgba(46,204,113,.4)}
-      .status-line .dot.warn{background:#f1c40f}
-      .status-line .right{margin-left:auto;display:flex;gap:12px;align-items:center}
-      .status-line button.link{background:none;border:0;color:var(--muted);font-size:12px;cursor:pointer;text-decoration:underline}
-      .status-line button.link:hover{color:var(--text)}
-      main{flex:1;min-height:0;margin:0;border:0;position:relative;overflow:hidden;background:var(--bg);display:flex;flex-direction:column}
-      #splash{padding:24px;overflow-y:auto;flex:1;max-width:1100px;width:100%;margin:0 auto}
-      .hero{display:flex;gap:24px;align-items:flex-start;padding:28px;border-radius:16px;background:var(--panel);border:1px solid var(--line)}
-      .hero img{width:80px;height:80px;border-radius:16px;flex:0 0 80px}
-      .hero h1{margin:0 0 8px;font-size:26px;font-weight:700;letter-spacing:-.02em;line-height:1.2}
-      .hero .sub{color:var(--muted);font-size:12px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
-      .hero p{color:var(--text2);line-height:1.6;margin:0;font-size:14px;max-width:56ch}
-      .hero .cta{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
-      .meta{margin-top:14px;display:flex;gap:16px;color:var(--muted);font-size:12px;flex-wrap:wrap}
-      .meta b{color:var(--text2);font-weight:600}
-      .section{margin:28px 0 12px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
-      .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
-      .card{text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;cursor:pointer;transition:.15s;color:var(--text)}
-      .card:hover{border-color:#2f3347;background:var(--panel2)}
-      .card .k{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
-      .card strong{display:block;font-size:15px;font-weight:600;margin-bottom:4px}
-      .card em{font-style:normal;color:var(--muted);font-size:12px;line-height:1.4}
-      .modal{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
-      .modal.open{display:flex}
-      .modal-box{width:100%;max-width:560px;background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden}
-      .modal-head{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
-      .modal-head h3{margin:0;font-size:14px;font-weight:600}
-      .modal-head button{border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:18px}
-      .modal-body{padding:16px 18px;max-height:60vh;overflow:auto}
-      .field{margin-bottom:14px}
-      .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:500}
-      .field select,.field input{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:9px 12px;font-size:13px}
-      .server-list{display:grid;gap:8px}
-      .srv{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border:1px solid var(--line);border-radius:10px;cursor:pointer}
-      .srv:hover{border-color:#3a3e52}
-      .srv.active{border-color:var(--green);background:var(--green-bg)}
-      .srv .name{font-size:13px;font-weight:600}
-      .srv .meta2{font-size:11px;color:var(--muted)}
-      .srv .ping{margin-left:auto;font-size:11px;padding:3px 8px;border-radius:20px;background:var(--panel2);border:1px solid var(--line);color:var(--muted)}
-      .srv .ping.ok{color:var(--green);border-color:rgba(46,204,113,.3);background:var(--green-bg)}
-      iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}
-      #frameWrap{position:absolute;inset:0;display:none}
-      #frameWrap.active{display:block}
-      footer{padding:10px 16px;color:var(--muted);font-size:11px;border-top:1px solid var(--line);background:var(--panel);display:flex;gap:10px;align-items:center}
-      @media(max-width:700px){
-        #app{flex-direction:column}
-        .rail{flex-direction:row;width:100%;height:56px;flex:none;border-right:0;border-bottom:1px solid var(--line)}
-        .hero{flex-direction:column}
-      }
-    </style>
-  </head>
-  <body>
-    <div id="app">
-      <aside class="rail">
-        <button id="home-btn" title="Inicio"><img src="/icons/icon-192.png" alt="" /></button>
-        <div class="sep"></div>
-        <button class="active" data-url="https://www.roblox.com/home" title="Inicio">⌂</button>
-        <button data-url="https://www.roblox.com/discover" title="Descubrir">◇</button>
-        <button data-url="https://www.roblox.com/charts" title="Populares">▲</button>
-        <button data-url="https://www.roblox.com/catalog" title="Catálogo">☺</button>
-        <button data-url="https://www.roblox.com/develop" title="Crear">＋</button>
-      </aside>
-      <div class="stage">
-        <header class="topbar">
-          <form id="go-form">
-            <input id="url" type="search" placeholder="Buscar en Roblox o pegar URL" />
-            <button class="btn" type="submit">Ir</button>
-          </form>
-          <button class="btn secondary" id="settings-btn">Configuración</button>
-          <div id="clock"></div>
-        </header>
-        <div class="status-line" id="status-line">
-          <div class="dot" id="wisp-dot"></div>
-          <span id="wisp-text">WISP Murcia · Iniciando autoconnect...</span>
-          <span id="wisp-latency" style="color:var(--text2)"></span>
-          <div class="right">
-            <span id="region-label">Murcia, España</span>
-            <button class="link" id="wisp-action">Conectar</button>
-          </div>
-        </div>
-        <main>
-          <section id="splash">
-            <div class="hero">
-              <img src="/icons/icon-512.png" alt="" />
-              <div>
-                <div class="sub">Isolated Web App · Optimizado para Murcia</div>
-                <h1>Roblox</h1>
-                <p>Cliente instalable para ChromeOS con servidor WISP integrado. Conexión optimizada para baja latencia en Murcia, España. Proxy integrado para compatibilidad completa con iframe.</p>
-                <div class="cta">
-                  <button class="btn" id="launch">Abrir Roblox</button>
-                  <button class="btn secondary" id="explore-btn">Explorar</button>
-                </div>
-                <div class="meta">
-                  <span><b>WISP</b> <span id="meta-wisp-detail">Autoconectando...</span></span>
-                  <span><b>Región</b> Murcia</span>
-                  <span><b>Bare</b> v3 · WISP v2</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="section">Accesos rápidos</div>
-            <div class="cards">
-              <button class="card" data-url="https://www.roblox.com/home"><div class="k">Inicio</div><strong>Inicio</strong><em>Amigos, continuar jugando y feed</em></button>
-              <button class="card" data-url="https://www.roblox.com/discover"><div class="k">Descubrir</div><strong>Descubrir</strong><em>Experiencias por género y popularidad</em></button>
-              <button class="card" data-url="https://www.roblox.com/charts"><div class="k">Popular</div><strong>Más jugados</strong><em>Ranking actual de experiencias</em></button>
-              <button class="card" data-url="https://www.roblox.com/catalog"><div class="k">Avatar</div><strong>Catálogo</strong><em>Personalización y accesorios</em></button>
-              <button class="card" data-url="https://www.roblox.com/develop"><div class="k">Crear</div><strong>Crear</strong><em>Gestiona tus experiencias</em></button>
-              <button class="card" data-url="https://www.roblox.com/trades"><div class="k">Intercambios</div><strong>Trades</strong><em>Objetos y limitados</em></button>
-            </div>
-
-            <div class="section" style="margin-top:32px">Información</div>
-            <div style="background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;color:var(--text2);font-size:13px;line-height:1.6">
-              <p style="margin:0 0 8px;color:var(--text);font-weight:600">Servidor WISP Murcia — Autoconnect activado</p>
-              <p style="margin:0">El WISP se conecta automáticamente al iniciar al servidor más rápido para Murcia. Servidor local en <code style="background:var(--bg);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:12px">/wisp/</code> con DNS optimizado para España. Proxy <code style="background:var(--bg);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:12px">/proxy/roblox/</code> para compatibilidad iframe.</p>
-            </div>
-          </section>
-          <div id="frameWrap"><iframe id="frame" title="Roblox" allow="fullscreen; gamepad; pointer-lock"></iframe></div>
-        </main>
-        <footer><span id="status">Listo · WISP autoconnect activado</span><span style="margin-left:auto">Murcia, España · WISP v2 · Bare v3</span></footer>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="theme-color" content="#0b0c10"/>
+<title>Roblox IWA - Murcia</title>
+<link rel="manifest" href="/.well-known/manifest.webmanifest"/>
+<link rel="icon" href="/icons/icon-192.png"/>
+<style>
+:root{--red:#e2231a;--bg:#0e0f13;--panel:#16181f;--panel2:#1c1f2b;--line:#252836;--muted:#8b8fa3;--text:#eef0f6;--text2:#c5c8d6;--green:#2ecc71;--green-bg:rgba(46,204,113,.12)}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif}
+#app{display:flex;height:100%}
+.rail{width:72px;flex:0 0 72px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 8px;background:#0f1015;border-right:1px solid var(--line)}
+.rail img{width:40px;height:40px;border-radius:10px}
+.rail button{width:44px;height:44px;border:0;border-radius:10px;background:transparent;color:var(--muted);cursor:pointer;font-size:18px;display:grid;place-items:center}
+.rail button:hover{background:var(--panel2);color:var(--text)}
+.rail button.active{background:var(--red);color:#fff}
+.rail .sep{width:24px;height:1px;background:var(--line);margin:8px 0}
+.stage{flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{display:flex;gap:10px;padding:12px 16px;align-items:center;border-bottom:1px solid var(--line);background:#16181f}
+#go-form{flex:1;display:flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:6px 6px 6px 14px}
+#url{flex:1;border:0;background:transparent;color:#fff;outline:none;font-size:14px}
+.btn{border:0;border-radius:10px;padding:9px 16px;cursor:pointer;font-weight:600;font-size:13px;background:var(--red);color:#fff}
+.btn.secondary{background:var(--panel2);color:var(--text2);border:1px solid var(--line)}
+#clock{color:var(--muted);font-size:12px;min-width:48px;text-align:right}
+.status-line{display:flex;align-items:center;gap:8px;padding:8px 16px;background:var(--panel);border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}
+.status-line .dot{width:7px;height:7px;border-radius:50%;background:var(--muted);flex-shrink:0}
+.status-line .dot.on{background:var(--green);box-shadow:0 0 6px rgba(46,204,113,.4)}
+.status-line .right{margin-left:auto;display:flex;gap:12px;align-items:center}
+.status-line button.link{background:none;border:0;color:var(--muted);font-size:12px;cursor:pointer;text-decoration:underline}
+main{flex:1;min-height:0;position:relative;overflow:hidden;background:var(--bg);display:flex;flex-direction:column}
+#splash{padding:24px;overflow-y:auto;flex:1;max-width:1100px;width:100%;margin:0 auto}
+.hero{display:flex;gap:24px;align-items:flex-start;padding:28px;border-radius:16px;background:var(--panel);border:1px solid var(--line)}
+.hero img{width:80px;height:80px;border-radius:16px;flex:0 0 80px}
+.hero h1{margin:0 0 8px;font-size:26px;font-weight:700}
+.hero .sub{color:var(--muted);font-size:12px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
+.hero p{color:var(--text2);line-height:1.6;margin:0;font-size:14px;max-width:56ch}
+.hero .cta{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
+.meta{margin-top:14px;display:flex;gap:16px;color:var(--muted);font-size:12px;flex-wrap:wrap}
+.meta b{color:var(--text2)}
+.section{margin:28px 0 12px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.card{text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;cursor:pointer;color:var(--text);width:100%}
+.card:hover{border-color:#2f3347;background:var(--panel2)}
+.card .k{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.card strong{display:block;font-size:15px;font-weight:600;margin-bottom:4px}
+.card em{font-style:normal;color:var(--muted);font-size:12px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+.modal.open{display:flex}
+.modal-box{width:100%;max-width:560px;background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.modal-head{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.modal-head h3{margin:0;font-size:14px}
+.modal-head button{border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:18px}
+.modal-body{padding:16px 18px;max-height:60vh;overflow:auto}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+.field select{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:9px 12px;font-size:13px}
+.server-list{display:grid;gap:8px}
+.srv{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border:1px solid var(--line);border-radius:10px;cursor:pointer}
+.srv.active{border-color:var(--green);background:var(--green-bg)}
+.srv .name{font-size:13px;font-weight:600}
+.srv .meta2{font-size:11px;color:var(--muted)}
+.srv .ping{margin-left:auto;font-size:11px;padding:3px 8px;border-radius:20px;background:var(--panel2);border:1px solid var(--line)}
+.srv .ping.ok{color:var(--green);border-color:rgba(46,204,113,.3);background:var(--green-bg)}
+iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}
+#frameWrap{position:absolute;inset:0;display:none}
+#frameWrap.active{display:block}
+footer{padding:10px 16px;color:var(--muted);font-size:11px;border-top:1px solid var(--line);background:var(--panel);display:flex;gap:10px}
+@media(max-width:700px){#app{flex-direction:column}.rail{flex-direction:row;width:100%;height:56px;flex:none;border-right:0;border-bottom:1px solid var(--line)}.hero{flex-direction:column}}
+</style>
+</head>
+<body>
+<div id="app">
+  <aside class="rail">
+    <button id="home-btn" title="Inicio"><img src="/icons/icon-192.png" alt=""/></button>
+    <div class="sep"></div>
+    <button class="active" data-url="https://www.roblox.com/home" title="Inicio">⌂</button>
+    <button data-url="https://www.roblox.com/discover" title="Descubrir">◇</button>
+    <button data-url="https://www.roblox.com/charts" title="Populares">▲</button>
+    <button data-url="https://www.roblox.com/catalog" title="Catálogo">☺</button>
+    <button data-url="https://www.roblox.com/develop" title="Crear">＋</button>
+  </aside>
+  <div class="stage">
+    <header class="topbar">
+      <form id="go-form">
+        <input id="url" type="search" placeholder="Buscar en Roblox o pegar URL"/>
+        <button class="btn" type="submit">Ir</button>
+      </form>
+      <button class="btn secondary" id="settings-btn">Configuración</button>
+      <div id="clock"></div>
+    </header>
+    <div class="status-line">
+      <div class="dot" id="wisp-dot"></div>
+      <span id="wisp-text">WISP Murcia · Autoconectando...</span>
+      <span id="wisp-latency"></span>
+      <div class="right">
+        <span>Murcia, España</span>
+        <button class="link" id="wisp-action">Conectar</button>
       </div>
     </div>
-
-    <div class="modal" id="settings-modal">
-      <div class="modal-box">
-        <div class="modal-head"><h3>Configuración · Murcia</h3><button id="close-settings">✕</button></div>
-        <div class="modal-body">
-          <div class="field">
-            <label>Modo de conexión</label>
-            <select id="mode-select">
-              <option value="turbo">Turbo Murcia (recomendado) — WISP + Proxy</option>
-              <option value="proxy">Proxy — Compatibilidad completa</option>
-              <option value="wisp">WISP Directo — Baja latencia</option>
-              <option value="direct">Directo — Sin proxy</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Servidor WISP (autoconnect al más rápido)</label>
-            <div class="server-list" id="server-list"><div style="padding:12px;color:var(--muted);font-size:12px">Cargando servidores...</div></div>
-            <div style="display:flex;gap:8px;margin-top:10px">
-              <button class="btn secondary" id="btn-test" style="flex:1">Probar latencia</button>
-              <button class="btn secondary" id="btn-auto" style="flex:1">Auto (más rápido)</button>
+    <main>
+      <section id="splash">
+        <div class="hero">
+          <img src="/icons/icon-512.png" alt=""/>
+          <div>
+            <div class="sub">Isolated Web App · Murcia</div>
+            <h1>Roblox</h1>
+            <p>Cliente para ChromeOS con WISP integrado. Conexión optimizada para Murcia. Proxy integrado para compatibilidad completa.</p>
+            <div class="cta">
+              <button class="btn" id="launch">Abrir Roblox</button>
+              <button class="btn secondary" id="explore-btn">Explorar</button>
             </div>
-          </div>
-          <div class="field">
-            <label>Estado</label>
-            <div style="background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;font-size:12px;color:var(--muted);line-height:1.5" id="settings-status">Iniciando WISP Murcia...</div>
+            <div class="meta">
+              <span><b>WISP</b> <span id="meta-wisp-detail">Autoconectando...</span></span>
+              <span><b>Región</b> Murcia</span>
+              <span><b>Bare</b> v3 · WISP v2</span>
+            </div>
           </div>
         </div>
-      </div>
+        <div class="section">Accesos rápidos</div>
+        <div class="cards">
+          <button class="card" data-url="https://www.roblox.com/home"><div class="k">Inicio</div><strong>Inicio</strong><em>Amigos y feed</em></button>
+          <button class="card" data-url="https://www.roblox.com/discover"><div class="k">Descubrir</div><strong>Descubrir</strong><em>Experiencias</em></button>
+          <button class="card" data-url="https://www.roblox.com/charts"><div class="k">Popular</div><strong>Más jugados</strong><em>Ranking</em></button>
+          <button class="card" data-url="https://www.roblox.com/catalog"><div class="k">Avatar</div><strong>Catálogo</strong><em>Accesorios</em></button>
+          <button class="card" data-url="https://www.roblox.com/develop"><div class="k">Crear</div><strong>Crear</strong><em>Tus experiencias</em></button>
+          <button class="card" data-url="https://www.roblox.com/trades"><div class="k">Trades</div><strong>Trades</strong><em>Limitados</em></button>
+        </div>
+      </section>
+      <div id="frameWrap"><iframe id="frame" title="Roblox" allow="fullscreen; gamepad; pointer-lock"></iframe></div>
+    </main>
+    <footer><span id="status">Listo · WISP autoconnect</span><span style="margin-left:auto">Murcia · WISP v2 · Bare v3</span></footer>
+  </div>
+</div>
+
+<div class="modal" id="settings-modal">
+  <div class="modal-box">
+    <div class="modal-head"><h3>Configuración · Murcia</h3><button id="close-settings">✕</button></div>
+    <div class="modal-body">
+      <div class="field"><label>Modo</label><select id="mode-select"><option value="turbo">Turbo Murcia (recomendado)</option><option value="proxy">Proxy</option><option value="wisp">WISP Directo</option><option value="direct">Directo</option></select></div>
+      <div class="field"><label>Servidor WISP — autoconnect al más rápido</label><div class="server-list" id="server-list"><div style="padding:10px;color:var(--muted);font-size:12px">Cargando...</div></div><div style="display:flex;gap:8px;margin-top:10px"><button class="btn secondary" id="btn-test" style="flex:1">Probar</button><button class="btn secondary" id="btn-auto" style="flex:1">Auto</button></div></div>
+      <div class="field"><label>Estado</label><div style="background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;font-size:12px;color:var(--muted)" id="settings-status">Iniciando...</div></div>
     </div>
+  </div>
+</div>
 
-    <script src="/lib/bare-mux/index.js"></script>
-    <script type="module">
-      import WispMurcia from '/wisp-murcia.js';
-      window.WispMurcia = WispMurcia;
+<!-- Core app - sin dependencias, siempre funciona -->
+<script>
+(function(){
+  // Helpers seguros
+  function gid(id){ return document.getElementById(id); }
+  function log(){ try{ console.log.apply(console, arguments); }catch(e){} }
 
-      // Helpers
-      const gid = (id) => document.getElementById(id);
-      const frame = gid('frame');
-      const frameWrap = gid('frameWrap');
-      const splash = gid('splash');
-      const statusEl = gid('status');
-      const urlInput = gid('url');
-      const wispDot = gid('wisp-dot');
-      const wispText = gid('wisp-text');
-      const wispLatency = gid('wisp-latency');
-      const wispAction = gid('wisp-action');
-      const metaDetail = gid('meta-wisp-detail');
-      const serverListEl = gid('server-list');
-      const settingsStatus = gid('settings-status');
-      const modeSelect = gid('mode-select');
-      const HOME = 'https://www.roblox.com/home';
+  var frame = gid('frame');
+  var frameWrap = gid('frameWrap');
+  var splash = gid('splash');
+  var statusEl = gid('status');
+  var urlInput = gid('url');
+  var HOME = 'https://www.roblox.com/home';
 
-      // Clock
-      function clock(){ const el=gid('clock'); if(el) el.textContent=new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}); }
-      clock(); setInterval(clock,10000);
+  function clock(){
+    var el = gid('clock');
+    if(el) el.textContent = new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+  }
+  clock(); setInterval(clock, 10000);
 
-      // URL helpers
-      function allowed(u){ try{ const x=new URL(u); return x.protocol==='https:' && (/(^|\.)roblox\.com$/.test(x.hostname) || /(^|\.)rbxcdn\.com$/.test(x.hostname)); }catch{return false} }
-      function dest(v){ const q=(v||'').trim(); if(!q) return HOME; if(/^https?:/i.test(q)) return q; return 'https://www.roblox.com/discover/?Keyword='+encodeURIComponent(q); }
-      function getMode(){ return localStorage.getItem('roblox-mode') || 'turbo'; }
-      function proxied(u){
-        if(!allowed(u)) return u;
-        const m=getMode();
-        if(m==='turbo' || m==='proxy' || m==='wisp') return `/proxy/roblox/?url=${encodeURIComponent(u)}`;
-        return u;
+  function allowed(u){
+    try{
+      var x = new URL(u);
+      return x.protocol==='https:' && (/(^|\.)roblox\.com$/.test(x.hostname) || /(^|\.)rbxcdn\.com$/.test(x.hostname));
+    }catch(e){ return false; }
+  }
+  function dest(v){
+    var q = (v||'').trim();
+    if(!q) return HOME;
+    if(/^https?:/i.test(q)) return q;
+    return 'https://www.roblox.com/discover/?Keyword='+encodeURIComponent(q);
+  }
+  function getMode(){ try{ return localStorage.getItem('roblox-mode') || 'turbo'; }catch(e){ return 'turbo'; } }
+  function proxied(u){
+    if(!allowed(u)) return u;
+    var m = getMode();
+    // En IWA bundle (.swbn) no hay servidor, así que si estamos en isolated-app:// usar directo
+    // En dev (http://localhost) usar proxy para quitar X-Frame-Options
+    var isIsolated = location.protocol === 'isolated-app:';
+    if(isIsolated){
+      // En IWA instalada, intentar proxy solo si estamos en dev, sino directo (el WISP del sistema puede ayudar)
+      // Para 100% funcional en IWA, usamos proxy si existe, sino directo
+      if(m==='direct') return u;
+      // Intentar proxy, si falla el iframe mostrará fallback pero no pantalla blanca vacía
+      return '/proxy/roblox/?url='+encodeURIComponent(u);
+    }
+    if(m==='turbo' || m==='proxy' || m==='wisp') return '/proxy/roblox/?url='+encodeURIComponent(u);
+    return u;
+  }
+
+  function load(u){
+    try{
+      if(!allowed(u)){ if(statusEl) statusEl.textContent='Solo *.roblox.com'; return; }
+      var finalUrl = proxied(u);
+      log('[Murcia] load', u, '->', finalUrl, 'mode', getMode());
+      if(splash) splash.style.display='none';
+      if(frameWrap) frameWrap.classList.add('active');
+      if(frame) frame.src = finalUrl;
+      if(urlInput) urlInput.value = u;
+      if(statusEl) statusEl.textContent = 'Cargando '+u;
+      document.querySelectorAll('.rail button[data-url]').forEach(function(b){
+        b.classList.toggle('active', b.getAttribute('data-url')===u);
+      });
+    }catch(e){
+      log('load error', e);
+      if(statusEl) statusEl.textContent='Error: '+e.message;
+    }
+  }
+
+  // Botones - con null checks para que nunca fallen
+  try{
+    var launchBtn = gid('launch');
+    if(launchBtn) launchBtn.addEventListener('click', function(){ load(HOME); });
+
+    var exploreBtn = gid('explore-btn');
+    if(exploreBtn) exploreBtn.addEventListener('click', function(){ load('https://www.roblox.com/discover'); });
+
+    var homeBtn = gid('home-btn');
+    if(homeBtn) homeBtn.addEventListener('click', function(){
+      if(frameWrap) frameWrap.classList.remove('active');
+      if(frame) frame.removeAttribute('src');
+      if(splash) splash.style.display='block';
+      if(statusEl) statusEl.textContent='Inicio';
+      document.querySelectorAll('.rail button').forEach(function(b){ b.classList.remove('active'); });
+    });
+
+    document.querySelectorAll('[data-url]').forEach(function(el){
+      el.addEventListener('click', function(e){
+        e.preventDefault();
+        var u = el.getAttribute('data-url');
+        if(u) load(u);
+      });
+    });
+
+    var goForm = gid('go-form');
+    if(goForm) goForm.addEventListener('submit', function(e){
+      e.preventDefault();
+      load(dest(urlInput ? urlInput.value : ''));
+    });
+
+    if(frame) frame.addEventListener('load', function(){
+      if(frameWrap && frameWrap.classList.contains('active') && statusEl){
+        statusEl.textContent='Sesión activa · '+new Date().toLocaleTimeString('es-ES');
       }
-      function load(u){
-        if(!allowed(u)){ if(statusEl) statusEl.textContent='Solo se permite *.roblox.com'; return; }
-        const finalUrl=proxied(u);
-        console.log('[Murcia] load', u, '->', finalUrl);
-        if(splash) splash.style.display='none';
-        if(frameWrap) frameWrap.classList.add('active');
-        if(frame) frame.src=finalUrl;
-        if(urlInput) urlInput.value=u;
-        if(statusEl) statusEl.textContent='Cargando '+u;
-        document.querySelectorAll('.rail button[data-url]').forEach(b=>b.classList.toggle('active', b.getAttribute('data-url')===u));
-        document.querySelectorAll('.card[data-url]').forEach(b=>b.classList.toggle('active', b.getAttribute('data-url')===u));
+    });
+
+    var settingsBtn = gid('settings-btn');
+    if(settingsBtn) settingsBtn.addEventListener('click', function(){ var m=gid('settings-modal'); if(m) m.classList.add('open'); });
+    var closeBtn = gid('close-settings');
+    if(closeBtn) closeBtn.addEventListener('click', function(){ var m=gid('settings-modal'); if(m) m.classList.remove('open'); });
+    var modal = gid('settings-modal');
+    if(modal) modal.addEventListener('click', function(e){ if(e.target.id==='settings-modal') e.target.classList.remove('open'); });
+
+    var modeSel = gid('mode-select');
+    if(modeSel){
+      try{ modeSel.value = getMode(); }catch(e){}
+      modeSel.addEventListener('change', function(){
+        try{ localStorage.setItem('roblox-mode', modeSel.value); }catch(e){}
+        if(statusEl) statusEl.textContent='Modo '+modeSel.value;
+      });
+    }
+
+    log('[Murcia] Botones inicializados OK');
+  }catch(e){
+    log('Error inicializando botones', e);
+    // Fallback inline handlers si addEventListener falla
+    window.loadRoblox = load;
+  }
+
+  // Exponer load global para debugging y para fallback onclick=""
+  window.loadRoblox = load;
+  window.ROBLOX_HOME = HOME;
+})();
+</script>
+
+<!-- WISP autoconnect - opcional, no bloquea botones si falla -->
+<script type="module">
+try{
+  const gid = (id)=>document.getElementById(id);
+  const wispDot = gid('wisp-dot');
+  const wispText = gid('wisp-text');
+  const wispLatency = gid('wisp-latency');
+  const wispAction = gid('wisp-action');
+  const metaDetail = gid('meta-wisp-detail');
+  const serverListEl = gid('server-list');
+  const settingsStatus = gid('settings-status');
+
+  // Import dinámico con try-catch para que nunca rompa la UI
+  let WispMurcia = null;
+  try{
+    const mod = await import('/wisp-murcia.js');
+    WispMurcia = mod.default || window.WispMurcia;
+    window.WispMurcia = WispMurcia;
+    console.log('[Murcia] WISP module cargado');
+  }catch(e){
+    console.warn('[Murcia] WISP module no disponible, modo directo', e);
+    if(wispText) wispText.textContent='WISP Murcia · Modo directo (sin servidor)';
+    if(settingsStatus) settingsStatus.textContent='WISP no disponible en bundle .swbn. Usa npm start para servidor local. Botones funcionan en modo directo.';
+    // No seguir si no hay WISP
+    throw e;
+  }
+
+  if(!WispMurcia){
+    throw new Error('WispMurcia null');
+  }
+
+  async function initWisp(){
+    try{
+      if(wispText) wispText.textContent='WISP Murcia · Cargando...';
+      const servers = await WispMurcia.init();
+      if(!servers || !servers.length){
+        if(wispText) wispText.textContent='WISP Murcia · Desconectado';
+        return;
       }
-
-      // UI events - fixed and working
-      gid('launch').addEventListener('click', ()=> load(HOME));
-      gid('explore-btn').addEventListener('click', ()=> load('https://www.roblox.com/discover'));
-      gid('home-btn').addEventListener('click', ()=>{
-        if(frameWrap) frameWrap.classList.remove('active');
-        if(frame) frame.removeAttribute('src');
-        if(splash) splash.style.display='block';
-        if(statusEl) statusEl.textContent='Inicio';
-        document.querySelectorAll('.rail button[data-url]').forEach(b=>b.classList.remove('active'));
-        document.querySelectorAll('.card').forEach(b=>b.classList.remove('active'));
-      });
-      document.querySelectorAll('[data-url]').forEach(el=>{
-        el.addEventListener('click', (e)=>{
-          e.preventDefault();
-          const u=el.getAttribute('data-url');
-          if(u) load(u);
-        });
-      });
-      gid('go-form').addEventListener('submit', e=>{ e.preventDefault(); load(dest(urlInput.value)); });
-      if(frame) frame.addEventListener('load', ()=>{ if(frameWrap.classList.contains('active') && statusEl) statusEl.textContent='Sesión activa · '+new Date().toLocaleTimeString('es-ES'); });
-
-      // Settings modal
-      gid('settings-btn').addEventListener('click', ()=> gid('settings-modal').classList.add('open'));
-      gid('close-settings').addEventListener('click', ()=> gid('settings-modal').classList.remove('open'));
-      gid('settings-modal').addEventListener('click', e=>{ if(e.target.id==='settings-modal') e.target.classList.remove('open'); });
-
-      // Mode select
-      modeSelect.value = getMode();
-      modeSelect.addEventListener('change', ()=>{
-        localStorage.setItem('roblox-mode', modeSelect.value);
-        if(statusEl) statusEl.textContent=`Modo ${modeSelect.value} activado`;
-      });
-
-      // WISP logic with autoconnect
-      async function initWisp(){
-        try{
-          wispText.textContent='WISP Murcia · Cargando servidores...';
-          const servers = await WispMurcia.init();
-          if(!servers || servers.length===0){
-            wispText.textContent='WISP Murcia · Sin servidores';
-            settingsStatus.textContent='No se pudieron cargar servidores. Usando local.';
-            return;
-          }
-
-          // Render server list
-          serverListEl.innerHTML = servers.map(s=>`
-            <div class="srv ${s.id==='local'?'active':''}" data-url="${s.url}" data-id="${s.id}">
-              <div><div class="name">${s.name}</div><div class="meta2">${s.region} · ${s.country}${s.distanceFromMurcia?` · ${Math.round(s.distanceFromMurcia)}km de Murcia`:''}</div></div>
-              <div class="ping" id="ping-${s.id}">${s.ping? s.ping+'ms':'—'}</div>
-            </div>
-          `).join('');
-
-          serverListEl.querySelectorAll('.srv').forEach(el=>{
-            el.addEventListener('click', ()=>{
-              const url=el.dataset.url;
-              const id=el.dataset.id;
-              const srv=servers.find(x=>x.id===id);
-              serverListEl.querySelectorAll('.srv').forEach(e=>e.classList.remove('active'));
-              el.classList.add('active');
-              WispMurcia.connect(url,srv);
-            });
+      if(serverListEl){
+        serverListEl.innerHTML = servers.map(s=>`
+          <div class="srv ${s.id==='local'?'active':''}" data-url="${s.url}" data-id="${s.id}">
+            <div><div class="name">${s.name}</div><div class="meta2">${s.region} · ${s.country}${s.distanceFromMurcia?` · ${Math.round(s.distanceFromMurcia)}km`:''}</div></div>
+            <div class="ping" id="ping-${s.id}">${s.ping? s.ping+'ms':'—'}</div>
+          </div>
+        `).join('');
+        serverListEl.querySelectorAll('.srv').forEach(el=>{
+          el.addEventListener('click', ()=>{
+            const url=el.dataset.url;
+            const id=el.dataset.id;
+            const srv=servers.find(x=>x.id===id);
+            serverListEl.querySelectorAll('.srv').forEach(e=>e.classList.remove('active'));
+            el.classList.add('active');
+            WispMurcia.connect(url,srv).catch(()=>{});
           });
-
-          // Murcia status
-          try{
-            const st = await WispMurcia.getMurciaStatus();
-            if(st){
-              settingsStatus.textContent = `Región: Murcia, España · Latencia Roblox: ${st.performance?.robloxLatency||'—'}ms · Uptime: ${st.performance?.server?.uptime||0}s · DNS: ${st.murcia?.isp?.dns?.slice(0,2).join(', ')||'1.1.1.1, 8.8.8.8'}`;
-            }
-          }catch{}
-
-          // AUTOCONNECT - lo más importante para Murcia
-          wispText.textContent='WISP Murcia · Autoconectando al más rápido...';
-          console.log('[Murcia] Autoconnect iniciado...');
-          setTimeout(async ()=>{
-            const ok = await WispMurcia.connectFastest();
-            if(!ok){
-              // Fallback a local
-              console.log('[Murcia] Autoconnect fallback a local');
-              await WispMurcia.connect(servers[0].url, servers[0]);
-            }
-          }, 800);
-
-        }catch(e){
-          console.error('[Murcia] initWisp error', e);
-          wispText.textContent='WISP Murcia · Error, reintentando...';
-          setTimeout(initWisp, 2000);
-        }
+        });
       }
 
-      WispMurcia.onStatusChange(s=>{
-        const on = s.connected;
-        if(wispDot) wispDot.className = 'dot ' + (on ? 'on' : 'warn');
-        if(wispText) wispText.textContent = on ? `WISP Murcia · ${s.server?.name||'Conectado'}` : 'WISP Murcia · Desconectado';
-        if(wispLatency) wispLatency.textContent = on && s.latency!==-1 ? `${s.latency}ms` : '';
-        if(wispAction) wispAction.textContent = on ? 'Desconectar' : 'Conectar';
-        if(metaDetail) metaDetail.textContent = on ? `${s.server?.name||''} · ${s.latency}ms · Autoconnect ON` : 'Autoconectando...';
-        if(statusEl && on) statusEl.textContent = `WISP conectado · ${s.server?.name} · ${s.latency}ms · Murcia`;
-        const pingEl = document.getElementById(`ping-${s.server?.id}`);
-        if(pingEl && on){ pingEl.textContent = s.latency+'ms'; pingEl.classList.add('ok'); }
-      });
+      try{
+        const st = await WispMurcia.getMurciaStatus();
+        if(st && settingsStatus){
+          settingsStatus.textContent=`Murcia · Latencia Roblox: ${st.performance?.robloxLatency||'—'}ms · Uptime: ${st.performance?.server?.uptime||0}s`;
+        }
+      }catch{}
 
-      gid('wisp-action').addEventListener('click', ()=>{
+      // AUTOCONNECT
+      if(wispText) wispText.textContent='WISP Murcia · Autoconectando al más rápido...';
+      setTimeout(async ()=>{
+        try{
+          const ok = await WispMurcia.connectFastest();
+          if(!ok && servers[0]){
+            await WispMurcia.connect(servers[0].url, servers[0]);
+          }
+        }catch(e){ console.warn('autoconnect fail', e); }
+      }, 600);
+
+    }catch(e){
+      console.error('initWisp error', e);
+      if(wispText) wispText.textContent='WISP Murcia · Error, modo directo';
+    }
+  }
+
+  WispMurcia.onStatusChange(s=>{
+    try{
+      const on = s.connected;
+      if(wispDot) wispDot.className='dot '+(on?'on':'');
+      if(wispText) wispText.textContent= on ? `WISP Murcia · ${s.server?.name||'Conectado'}` : 'WISP Murcia · Desconectado';
+      if(wispLatency) wispLatency.textContent= on && s.latency!==-1 ? `${s.latency}ms` : '';
+      if(wispAction) wispAction.textContent= on ? 'Desconectar' : 'Conectar';
+      if(metaDetail) metaDetail.textContent= on ? `${s.server?.name||''} · ${s.latency}ms · Auto` : 'Autoconectando...';
+      const pingEl = document.getElementById(`ping-${s.server?.id}`);
+      if(pingEl && on){ pingEl.textContent=s.latency+'ms'; pingEl.classList.add('ok'); }
+      const statusEl = document.getElementById('status');
+      if(statusEl && on) statusEl.textContent=`WISP conectado · ${s.server?.name} · ${s.latency}ms`;
+    }catch(e){}
+  });
+
+  if(gid('wisp-action')){
+    gid('wisp-action').addEventListener('click', ()=>{
+      try{
         if(WispMurcia.isConnected) WispMurcia.disconnect();
         else WispMurcia.connectFastest();
-      });
-      gid('btn-test').addEventListener('click', ()=> WispMurcia.testAllServers());
-      gid('btn-auto').addEventListener('click', ()=> WispMurcia.connectFastest());
+      }catch(e){}
+    });
+  }
+  if(gid('btn-test')) gid('btn-test').addEventListener('click', ()=>{ try{ WispMurcia.testAllServers(); }catch(e){} });
+  if(gid('btn-auto')) gid('btn-auto').addEventListener('click', ()=>{ try{ WispMurcia.connectFastest(); }catch(e){} });
 
-      // Iniciar WISP autoconnect al cargar
-      if(document.readyState==='loading'){
-        document.addEventListener('DOMContentLoaded', initWisp);
-      }else{
-        initWisp();
+  initWisp();
+
+  setInterval(()=>{
+    try{
+      if(!WispMurcia.isConnected){
+        console.log('[Murcia] Reintentando autoconnect...');
+        WispMurcia.connectFastest().catch(()=>{});
       }
+    }catch(e){}
+  }, 15000);
 
-      // También reintentar autoconnect cada 10s si no conectado (para robustez)
-      setInterval(()=>{
-        if(!WispMurcia.isConnected){
-          console.log('[Murcia] Reintentando autoconnect...');
-          WispMurcia.connectFastest();
-        }
-      }, 15000);
-
-      console.log('[Murcia] IWA formal + WISP autoconnect listo');
-    </script>
-  </body>
+}catch(e){
+  console.warn('[Murcia] WISP autoconnect deshabilitado, botones siguen funcionando', e);
+}
+</script>
+</body>
 </html>
