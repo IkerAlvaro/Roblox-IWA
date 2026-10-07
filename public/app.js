@@ -73,9 +73,13 @@ document.getElementById("go-form").addEventListener("submit", (event) => {
   load(searchOrUrl(urlInput.value));
 });
 
-document.getElementById("fullscreen").addEventListener("click", () => {
-  if (!document.fullscreenElement) document.documentElement.requestFullscreen();
-  else document.exitFullscreen();
+document.getElementById("fullscreen").addEventListener("click", async () => {
+  try {
+    if (!document.fullscreenElement) await document.documentElement.requestFullscreen();
+    else await document.exitFullscreen();
+  } catch {
+    statusEl.textContent = "Pantalla completa no disponible aquí";
+  }
 });
 
 frame.addEventListener("load", () => {
