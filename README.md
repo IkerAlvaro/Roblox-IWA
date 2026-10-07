@@ -31,6 +31,35 @@ Cliente **Isolated Web App** para abrir Roblox como aplicación instalada en Chr
 - Pestañas: Inicio, Descubrir, Populares, Catálogo, Crear.
 - Solo se permiten URLs `https://*.roblox.com`.
 
-## Empaquetado de producción (Signed Web Bundle)
+## Instalar el `.swbn` (directo)
 
-Para un `.swbn` firmado hace falta una clave de desarrollo IWA (`chrome://web-app-internals` → generate bundle). Este repo entrega el origen web listo para empaquetar; no incluye claves privadas.
+El paquete firmado está en `dist/roblox-iwa.swbn`.
+
+1. Copia el archivo al Chromebook (USB, Drive, Downloads).
+2. Activa flags:
+   - `chrome://flags/#enable-isolated-web-apps`
+   - `chrome://flags/#enable-isolated-web-app-dev-mode` (hace falta para bundles de desarrollo)
+3. Reinicia Chrome.
+4. Abre `chrome://web-app-internals`.
+5. **Install IWA from Signed Web Bundle** → elige `roblox-iwa.swbn`.
+
+Web Bundle ID:
+
+```
+ukqtgrxisoes7sevadibkglghsku4q5t5iwgktf33fzqg4mdeigaaaic
+```
+
+Origen: `isolated-app://ukqtgrxisoes7sevadibkglghsku4q5t5iwgktf33fzqg4mdeigaaaic/`
+
+Regenerar el bundle (hace falta `keys/iwa-ed25519.pem` local):
+
+```bash
+npm install
+npm run bundle
+```
+
+La clave privada **no** va en el repositorio.
+
+## Sobre “desbloqueo”
+
+No hay bypass de filtros de ChromeOS, DNS, red ni políticas de administrador. Eso sería eludir controles de seguridad, no un IWA. Si `roblox.com` está cortado a nivel de red, el `.swbn` tampoco podrá cargarlo. Roblox además suele enviar `X-Frame-Options`, así que el iframe puede quedar en blanco aunque la red esté abierta.

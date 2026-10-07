@@ -4,6 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node server.mjs"
+    "start": "node server.mjs",
+    "bundle": "node scripts/build-swbn.mjs"
+  },
+  "dependencies": {
+    "wbn": "^0.0.9",
+    "wbn-sign": "^0.3.1"
   }
 }
