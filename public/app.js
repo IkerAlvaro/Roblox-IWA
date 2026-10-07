@@ -4,6 +4,16 @@ const statusEl = document.getElementById("status");
 const urlInput = document.getElementById("url");
 const HOME = "https://www.roblox.com/home";
 
+function tick() {
+  const now = new Date();
+  document.getElementById("clock").textContent = now.toLocaleTimeString("es-ES", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+tick();
+setInterval(tick, 10000);
+
 function allowed(url) {
   try {
     const u = new URL(url);
@@ -11,6 +21,19 @@ function allowed(url) {
   } catch {
     return false;
   }
+}
+
+function searchOrUrl(value) {
+  const q = value.trim();
+  if (!q) return HOME;
+  if (/^https?:/i.test(q)) return q;
+  return "https://www.roblox.com/discover/?Keyword=" + encodeURIComponent(q);
+}
+
+function setActive(url) {
+  document.querySelectorAll(".rail nav button").forEach((b) => {
+    b.classList.toggle("active", b.dataset.url === url);
+  });
 }
 
 function load(url) {
@@ -23,22 +46,38 @@ function load(url) {
   frame.src = url;
   urlInput.value = url;
   statusEl.textContent = "Cargando " + url;
-  document.querySelectorAll(".tabs button").forEach((b) => {
-    b.classList.toggle("active", b.dataset.url === url);
-  });
+  setActive(url);
 }
 
 document.getElementById("launch").addEventListener("click", () => load(HOME));
+document.getElementById("home-btn").addEventListener("click", () => {
+  frame.hidden = true;
+  splash.hidden = false;
+  statusEl.textContent = "Inicio";
+});
 
-document.querySelectorAll(".tabs button").forEach((button) => {
-  button.addEventListener("click", () => load(button.dataset.url));
+document.querySelectorAll("[data-url]").forEach((el) => {
+  el.addEventListener("click", (event) => {
+    event.preventDefault();
+    load(el.dataset.url);
+  });
+});
+
+document.getElementById("discover-link").addEventListener("click", (event) => {
+  event.preventDefault();
+  load("https://www.roblox.com/discover");
 });
 
 document.getElementById("go-form").addEventListener("submit", (event) => {
   event.preventDefault();
-  load(urlInput.value.trim());
+  load(searchOrUrl(urlInput.value));
+});
+
+document.getElementById("fullscreen").addEventListener("click", () => {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+  else document.exitFullscreen();
 });
 
 frame.addEventListener("load", () => {
-  statusEl.textContent = "Roblox cargado en el IWA";
+  if (!frame.hidden) statusEl.textContent = "Sesión abierta en el IWA";
 });

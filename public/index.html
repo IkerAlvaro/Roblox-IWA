@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#e2231a" />
+    <meta name="theme-color" content="#121215" />
     <title>Roblox IWA</title>
     <link rel="manifest" href="/.well-known/manifest.webmanifest" />
     <link rel="icon" href="/icons/icon-192.png" />
@@ -11,49 +11,101 @@
   </head>
   <body>
     <div id="app">
-      <header class="topbar">
-        <div class="brand">
-          <img src="/icons/icon-192.png" alt="" width="36" height="36" />
-          <span>Roblox IWA</span>
-        </div>
-        <nav class="tabs">
-          <button data-url="https://www.roblox.com/home" class="active">Inicio</button>
-          <button data-url="https://www.roblox.com/discover">Descubrir</button>
-          <button data-url="https://www.roblox.com/charts">Populares</button>
-          <button data-url="https://www.roblox.com/catalog">Catálogo</button>
-          <button data-url="https://www.roblox.com/develop">Crear</button>
+      <aside class="rail">
+        <button class="logo" id="home-btn" title="Inicio">
+          <img src="/icons/icon-192.png" alt="Roblox IWA" />
+        </button>
+        <nav>
+          <button data-url="https://www.roblox.com/home" class="active" title="Inicio">⌂</button>
+          <button data-url="https://www.roblox.com/discover" title="Descubrir">◇</button>
+          <button data-url="https://www.roblox.com/charts" title="Populares">▲</button>
+          <button data-url="https://www.roblox.com/catalog" title="Avatar">☺</button>
+          <button data-url="https://www.roblox.com/develop" title="Crear">＋</button>
         </nav>
-        <form id="go-form">
-          <input id="url" type="url" spellcheck="false" placeholder="https://www.roblox.com/..." />
-          <button type="submit">Ir</button>
-        </form>
-      </header>
-      <main>
-        <div id="splash">
-          <img src="/icons/icon-512.png" alt="Roblox IWA" />
-          <h1>Roblox en ChromeOS</h1>
-          <p>
-            Isolated Web App local. Se abre como aplicación independiente, no como
-            pestaña de chrome:// con el dominio bloqueado.
-          </p>
-          <button id="launch">Abrir Roblox</button>
-          <p class="hint">
-            Si la red del centro o el DNS bloquean roblox.com, esta app tampoco
-            podrá conectarse. Un IWA no salta filtros de red ni políticas de
-            administrador.
-          </p>
-        </div>
-        <iframe
-          id="frame"
-          title="Roblox"
-          allow="fullscreen; gamepad; pointer-lock; clipboard-read; clipboard-write"
-          referrerpolicy="no-referrer-when-downgrade"
-          hidden
-        ></iframe>
-      </main>
-      <footer>
-        <span id="status">Listo</span>
-      </footer>
+        <button id="fullscreen" title="Pantalla completa">⛶</button>
+      </aside>
+
+      <div class="stage">
+        <header class="topbar">
+          <form id="go-form">
+            <span class="search-ico">⌕</span>
+            <input id="url" type="search" spellcheck="false" placeholder="Buscar en Roblox o pegar una URL…" />
+            <button type="submit">Ir</button>
+          </form>
+          <div class="clock" id="clock"></div>
+        </header>
+
+        <main>
+          <section id="splash">
+            <div class="hero">
+              <div class="hero-copy">
+                <p class="kicker">Isolated Web App · ChromeOS</p>
+                <h1>Juega desde una app,<br />no desde una pestaña.</h1>
+                <p class="lede">
+                  Cliente instalable con origen <code>isolated-app://</code>.
+                  Abre el sitio oficial de Roblox en su propio marco.
+                </p>
+                <div class="cta">
+                  <button id="launch" class="btn-primary">Abrir Roblox</button>
+                  <a class="btn-ghost" href="https://www.roblox.com/discover" id="discover-link">Explorar experiencias</a>
+                </div>
+              </div>
+              <div class="hero-art">
+                <img src="/icons/icon-512.png" alt="" />
+                <div class="orb"></div>
+              </div>
+            </div>
+
+            <h2 class="section-title">Accesos rápidos</h2>
+            <div class="cards">
+              <button class="card" data-url="https://www.roblox.com/home">
+                <span class="tag">Casa</span>
+                <strong>Inicio</strong>
+                <em>Amigos, continuar y destacados</em>
+              </button>
+              <button class="card" data-url="https://www.roblox.com/discover">
+                <span class="tag">Jugar</span>
+                <strong>Descubrir</strong>
+                <em>Experiencias y géneros</em>
+              </button>
+              <button class="card" data-url="https://www.roblox.com/charts">
+                <span class="tag">Top</span>
+                <strong>Populares</strong>
+                <em>Lo que más se juega ahora</em>
+              </button>
+              <button class="card" data-url="https://www.roblox.com/catalog">
+                <span class="tag">Look</span>
+                <strong>Avatar</strong>
+                <em>Catálogo y estilo</em>
+              </button>
+              <button class="card" data-url="https://www.roblox.com/develop">
+                <span class="tag">Studio</span>
+                <strong>Crear</strong>
+                <em>Experiencias y creaciones</em>
+              </button>
+              <button class="card" data-url="https://www.roblox.com/trades">
+                <span class="tag">Items</span>
+                <strong>Intercambios</strong>
+                <em>Limiteds y valor</em>
+              </button>
+            </div>
+          </section>
+
+          <iframe
+            id="frame"
+            title="Roblox"
+            allow="fullscreen; gamepad; pointer-lock; clipboard-read; clipboard-write"
+            referrerpolicy="no-referrer-when-downgrade"
+            hidden
+          ></iframe>
+        </main>
+
+        <footer>
+          <span id="status">Listo</span>
+          <span class="sep">·</span>
+          <span>Solo https://*.roblox.com</span>
+        </footer>
+      </div>
     </div>
     <script src="/app.js" type="module"></script>
   </body>
