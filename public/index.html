@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#e2231a" />
+    <title>Roblox IWA</title>
+    <link rel="manifest" href="/.well-known/manifest.webmanifest" />
+    <link rel="icon" href="/icons/icon-192.png" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="topbar">
+        <div class="brand">
+          <img src="/icons/icon-192.png" alt="" width="36" height="36" />
+          <span>Roblox IWA</span>
+        </div>
+        <nav class="tabs">
+          <button data-url="https://www.roblox.com/home" class="active">Inicio</button>
+          <button data-url="https://www.roblox.com/discover">Descubrir</button>
+          <button data-url="https://www.roblox.com/charts">Populares</button>
+          <button data-url="https://www.roblox.com/catalog">Catálogo</button>
+          <button data-url="https://www.roblox.com/develop">Crear</button>
+        </nav>
+        <form id="go-form">
+          <input id="url" type="url" spellcheck="false" placeholder="https://www.roblox.com/..." />
+          <button type="submit">Ir</button>
+        </form>
+      </header>
+      <main>
+        <div id="splash">
+          <img src="/icons/icon-512.png" alt="Roblox IWA" />
+          <h1>Roblox en ChromeOS</h1>
+          <p>
+            Isolated Web App local. Se abre como aplicación independiente, no como
+            pestaña de chrome:// con el dominio bloqueado.
+          </p>
+          <button id="launch">Abrir Roblox</button>
+          <p class="hint">
+            Si la red del centro o el DNS bloquean roblox.com, esta app tampoco
+            podrá conectarse. Un IWA no salta filtros de red ni políticas de
+            administrador.
+          </p>
+        </div>
+        <iframe
+          id="frame"
+          title="Roblox"
+          allow="fullscreen; gamepad; pointer-lock; clipboard-read; clipboard-write"
+          referrerpolicy="no-referrer-when-downgrade"
+          hidden
+        ></iframe>
+      </main>
+      <footer>
+        <span id="status">Listo</span>
+      </footer>
+    </div>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>
