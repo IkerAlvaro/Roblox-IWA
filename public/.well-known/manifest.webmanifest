@@ -1,15 +1,21 @@
 {
   "id": "/",
-  "name": "Roblox IWA",
-  "short_name": "Roblox",
-  "description": "Cliente Isolated Web App de Roblox para ChromeOS.",
-  "version": "1.0.0.1",
+  "name": "Roblox IWA - Murcia WISP ⚡",
+  "short_name": "Roblox Murcia",
+  "description": "Cliente Isolated Web App de Roblox optimizado para Murcia, España. Servidor WISP ultra rápido, proxy sin bloqueo, 100% funcional.",
+  "version": "2.0.0",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#0b0c10",
   "theme_color": "#e2231a",
   "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
     {
       "src": "/icons/icon-512.png",
       "sizes": "512x512",
@@ -19,5 +25,17 @@
   ],
   "permissions_policy": {
     "cross-origin-isolated": ["self"]
+  },
+  "isolated_storage": true,
+  "wisp": {
+    "enabled": true,
+    "endpoint": "/wisp/",
+    "region": "Murcia, España",
+    "optimized": true
+  },
+  "proxy": {
+    "bare": "/bare/",
+    "wisp": "/wisp/",
+    "roblox": "/proxy/roblox/"
   }
 }

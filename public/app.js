@@ -1,4 +1,9 @@
+/**
+ * Roblox IWA - Murcia WISP Client
+ * Legacy app.js - ahora usa WispMurcia
+ */
 const frame = document.getElementById("frame");
+const frameWrap = document.getElementById("frameWrap");
 const splash = document.getElementById("splash");
 const statusEl = document.getElementById("status");
 const urlInput = document.getElementById("url");
@@ -6,10 +11,13 @@ const HOME = "https://www.roblox.com/home";
 
 function tick() {
   const now = new Date();
-  document.getElementById("clock").textContent = now.toLocaleTimeString("es-ES", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const clock = document.getElementById("clock");
+  if (clock) {
+    clock.textContent = now.toLocaleTimeString("es-ES", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
 }
 tick();
 setInterval(tick, 10000);
@@ -31,29 +39,53 @@ function searchOrUrl(value) {
 }
 
 function setActive(url) {
-  document.querySelectorAll(".rail nav button").forEach((b) => {
+  document.querySelectorAll(".rail nav button, .rail button[data-url]").forEach((b) => {
     b.classList.toggle("active", b.dataset.url === url);
   });
 }
 
 function load(url) {
   if (!allowed(url)) {
-    statusEl.textContent = "Solo se permite https://*.roblox.com";
+    if (statusEl) statusEl.textContent = "Solo se permite https://*.roblox.com";
     return;
   }
-  splash.hidden = true;
-  frame.hidden = false;
-  frame.src = url;
-  urlInput.value = url;
-  statusEl.textContent = "Cargando " + url;
+  
+  // Usar WISP Murcia proxy si está disponible
+  let finalUrl = url;
+  if (window.WispMurcia) {
+    const mode = localStorage.getItem('roblox-mode') || 'turbo';
+    if (mode === 'turbo' || mode === 'proxy' || mode === 'wisp') {
+      finalUrl = `/proxy/roblox/?url=${encodeURIComponent(url)}`;
+    }
+  }
+  
+  if (splash) splash.hidden = true;
+  if (splash) splash.style.display = 'none';
+  if (frameWrap) frameWrap.classList.add('active');
+  if (frame) {
+    frame.hidden = false;
+    frame.src = finalUrl;
+  }
+  if (urlInput) urlInput.value = url;
+  if (statusEl) statusEl.textContent = "Cargando " + url + " ⚡ Murcia";
   setActive(url);
 }
 
-document.getElementById("launch").addEventListener("click", () => load(HOME));
-document.getElementById("home-btn").addEventListener("click", () => {
-  frame.hidden = true;
-  splash.hidden = false;
-  statusEl.textContent = "Inicio";
+const launchBtn = document.getElementById("launch");
+if (launchBtn) launchBtn.addEventListener("click", () => load(HOME));
+
+const homeBtn = document.getElementById("home-btn");
+if (homeBtn) homeBtn.addEventListener("click", () => {
+  if (frame) {
+    frame.hidden = true;
+    frame.removeAttribute("src");
+  }
+  if (frameWrap) frameWrap.classList.remove('active');
+  if (splash) {
+    splash.hidden = false;
+    splash.style.display = 'block';
+  }
+  if (statusEl) statusEl.textContent = "Inicio - Murcia Turbo ⚡";
 });
 
 document.querySelectorAll("[data-url]").forEach((el) => {
@@ -63,25 +95,28 @@ document.querySelectorAll("[data-url]").forEach((el) => {
   });
 });
 
-document.getElementById("discover-link").addEventListener("click", (event) => {
+const discoverLink = document.getElementById("discover-link");
+if (discoverLink) discoverLink.addEventListener("click", (event) => {
   event.preventDefault();
   load("https://www.roblox.com/discover");
 });
 
-document.getElementById("go-form").addEventListener("submit", (event) => {
+const goForm = document.getElementById("go-form");
+if (goForm) goForm.addEventListener("submit", (event) => {
   event.preventDefault();
   load(searchOrUrl(urlInput.value));
 });
 
-document.getElementById("fullscreen").addEventListener("click", async () => {
+const fsBtn = document.getElementById("fullscreen");
+if (fsBtn) fsBtn.addEventListener("click", async () => {
   try {
     if (!document.fullscreenElement) await document.documentElement.requestFullscreen();
     else await document.exitFullscreen();
   } catch {
-    statusEl.textContent = "Pantalla completa no disponible aquí";
+    if (statusEl) statusEl.textContent = "Pantalla completa no disponible aquí";
   }
 });
 
-frame.addEventListener("load", () => {
-  if (!frame.hidden) statusEl.textContent = "Sesión abierta en el IWA";
+if (frame) frame.addEventListener("load", () => {
+  if (!frame.hidden && statusEl) statusEl.textContent = "Sesión abierta en el IWA Murcia ⚡";
 });

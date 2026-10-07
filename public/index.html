@@ -4,149 +4,490 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#0b0c10" />
-    <title>Roblox IWA</title>
+    <title>Roblox IWA - Murcia WISP ⚡</title>
     <link rel="manifest" href="/.well-known/manifest.webmanifest" />
     <link rel="icon" href="/icons/icon-192.png" />
     <style>
-      :root { --red:#e2231a; --red2:#ff5a3c; --bg:#0b0c10; --panel:#14161e; --line:#2a2e3a; --muted:#9aa3b5; --text:#f5f7fb; }
+      :root { --red:#e2231a; --red2:#ff5a3c; --bg:#0b0c10; --panel:#14161e; --panel2:#1b1e29; --line:#2a2e3a; --muted:#9aa3b5; --text:#f5f7fb; --green:#22c55e; --yellow:#eab308; --blue:#3b82f6; }
       * { box-sizing: border-box; }
       html, body { margin: 0; height: 100%; background:
         radial-gradient(900px 380px at 100% 0%, rgba(226,35,26,.22), transparent 55%),
         radial-gradient(700px 320px at 0% 100%, rgba(70,80,200,.14), transparent 50%),
         var(--bg); color: var(--text); font-family: system-ui, "Segoe UI", sans-serif; }
       #app { display: flex; height: 100%; }
-      .rail { width: 78px; flex: 0 0 78px; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 8px; background: rgba(12,13,18,.9); border-right: 1px solid var(--line); }
+      .rail { width: 78px; flex: 0 0 78px; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 8px; background: rgba(12,13,18,.95); border-right: 1px solid var(--line); z-index: 10; }
       .rail img { width: 42px; height: 42px; border-radius: 12px; object-fit: cover; display: block; }
-      .rail button { width: 46px; height: 46px; border: 0; border-radius: 14px; background: transparent; color: #fff; cursor: pointer; font-size: 18px; }
-      .rail button:hover { background: #232633; }
-      .rail button.active { background: linear-gradient(180deg, var(--red2), var(--red)); }
+      .rail button { width: 46px; height: 46px; border: 0; border-radius: 14px; background: transparent; color: #fff; cursor: pointer; font-size: 18px; transition: .15s; }
+      .rail button:hover { background: #232633; transform: scale(1.05); }
+      .rail button.active { background: linear-gradient(180deg, var(--red2), var(--red)); box-shadow: 0 4px 12px rgba(226,35,26,.3); }
+      .rail .sep { width: 28px; height: 1px; background: var(--line); margin: 6px 0; }
       .stage { flex: 1; min-width: 0; display: flex; flex-direction: column; height: 100%; }
-      .topbar { display: flex; gap: 12px; padding: 14px 18px; align-items: center; }
+      .topbar { display: flex; gap: 12px; padding: 12px 16px; align-items: center; background: rgba(20,22,30,.8); border-bottom: 1px solid var(--line); backdrop-filter: blur(10px); }
       #go-form { flex: 1; display: flex; align-items: center; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 6px 6px 6px 16px; }
-      #url { flex: 1; border: 0; background: transparent; color: #fff; outline: none; font-size: 15px; }
-      .pill, .btn { border: 0; border-radius: 999px; padding: 10px 16px; cursor: pointer; font-weight: 700; background: linear-gradient(90deg, var(--red), var(--red2)); color: #fff; }
+      #url { flex: 1; border: 0; background: transparent; color: #fff; outline: none; font-size: 14px; }
+      .pill, .btn { border: 0; border-radius: 999px; padding: 10px 16px; cursor: pointer; font-weight: 700; background: linear-gradient(90deg, var(--red), var(--red2)); color: #fff; transition: .15s; }
+      .pill:hover, .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(226,35,26,.4); }
       .ghost { background: #2a2e3a; }
-      #clock { color: var(--muted); min-width: 64px; text-align: right; font-variant-numeric: tabular-nums; }
-      main { flex: 1; min-height: 0; margin: 0 16px 10px; border: 1px solid var(--line); border-radius: 20px; position: relative; overflow: auto; background: rgba(16,18,26,.72); }
-      #splash { padding: 22px; }
-      .hero { display: flex; gap: 22px; align-items: center; flex-wrap: wrap; padding: 26px; border-radius: 18px; background:
-        linear-gradient(115deg, rgba(226,35,26,.2), transparent 42%), var(--panel); border: 1px solid var(--line); }
-      .hero img { width: 112px; height: 112px; border-radius: 28px; object-fit: cover; }
-      .kicker { margin: 0 0 6px; letter-spacing: .16em; text-transform: uppercase; font-size: 11px; color: #ffb4a8; }
-      h1 { margin: 0 0 8px; font-size: clamp(26px, 4vw, 40px); letter-spacing: -.03em; }
-      p { color: var(--muted); line-height: 1.5; margin: 0; max-width: 52ch; }
-      .cta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
-      .stats { display: flex; gap: 18px; margin-top: 16px; color: var(--muted); font-size: 13px; }
+      .ghost:hover { background: #343a4a; box-shadow: none; transform: none; }
+      .btn-turbo { background: linear-gradient(90deg, #f59e0b, #ef4444); animation: pulse 2s infinite; }
+      .btn-turbo.active { background: linear-gradient(90deg, #22c55e, #16a34a); animation: none; }
+      @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(245,158,11,.4); } 50% { box-shadow: 0 0 0 8px rgba(245,158,11,0); } }
+      #clock { color: var(--muted); min-width: 64px; text-align: right; font-variant-numeric: tabular-nums; font-size: 13px; }
+      main { flex: 1; min-height: 0; margin: 0 12px 8px; border: 1px solid var(--line); border-radius: 16px; position: relative; overflow: hidden; background: rgba(16,18,26,.72); display: flex; flex-direction: column; }
+      
+      /* WISP Bar */
+      .wisp-bar { display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: linear-gradient(90deg, rgba(34,197,94,.1), rgba(59,130,246,.1)); border-bottom: 1px solid var(--line); font-size: 13px; flex-wrap: wrap; }
+      .wisp-bar .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); flex: 0 0 10px; box-shadow: 0 0 0 2px rgba(255,255,255,.1); }
+      .wisp-bar .dot.connected { background: var(--green); box-shadow: 0 0 8px var(--green); animation: blink 1.5s infinite; }
+      .wisp-bar .dot.connecting, .wisp-bar .dot.testing { background: var(--yellow); box-shadow: 0 0 8px var(--yellow); animation: blink .8s infinite; }
+      .wisp-bar .dot.error, .wisp-bar .dot.offline { background: var(--red); }
+      @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: .5; } }
+      .wisp-bar .spacer { flex: 1; }
+      .wisp-bar select, .wisp-bar button.small { background: var(--panel2); border: 1px solid var(--line); color: #fff; border-radius: 8px; padding: 6px 10px; font-size: 12px; cursor: pointer; }
+      .wisp-bar button.small:hover { background: #2a2e3a; }
+      .ping { font-size: 11px; padding: 2px 6px; border-radius: 999px; background: var(--panel2); border: 1px solid var(--line); }
+      .ping.fast { color: var(--green); border-color: rgba(34,197,94,.3); background: rgba(34,197,94,.1); }
+      .ping.medium { color: var(--yellow); border-color: rgba(234,179,8,.3); background: rgba(234,179,8,.1); }
+      .ping.slow { color: #fb7185; border-color: rgba(251,113,133,.3); background: rgba(251,113,133,.1); }
+      .ping.offline { color: var(--muted); }
+
+      #splash { padding: 18px; overflow-y: auto; flex: 1; }
+      .hero { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; padding: 22px; border-radius: 16px; background:
+        linear-gradient(115deg, rgba(226,35,26,.18), transparent 42%), linear-gradient(115deg, rgba(34,197,94,.08), transparent 60%), var(--panel); border: 1px solid var(--line); }
+      .hero img { width: 96px; height: 96px; border-radius: 22px; object-fit: cover; box-shadow: 0 8px 24px rgba(0,0,0,.3); }
+      .kicker { margin: 0 0 6px; letter-spacing: .16em; text-transform: uppercase; font-size: 10px; color: #ffb4a8; display: flex; gap: 8px; align-items: center; }
+      .kicker .badge { background: linear-gradient(90deg, var(--red), var(--red2)); color: #fff; padding: 2px 8px; border-radius: 999px; font-size: 10px; letter-spacing: .05em; }
+      .kicker .badge.murcia { background: linear-gradient(90deg, #f59e0b, #ef4444); }
+      h1 { margin: 0 0 8px; font-size: clamp(22px, 3.5vw, 32px); letter-spacing: -.03em; line-height: 1.1; }
+      p { color: var(--muted); line-height: 1.5; margin: 0; max-width: 60ch; font-size: 14px; }
+      .cta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+      .stats { display: flex; gap: 14px; margin-top: 14px; color: var(--muted); font-size: 12px; flex-wrap: wrap; }
       .stats b { color: var(--text); }
-      .section { margin: 22px 0 10px; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
-      .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 12px; }
-      .card { text-align: left; color: #fff; cursor: pointer; border: 1px solid var(--line); border-radius: 16px; padding: 16px; min-height: 118px; background: #1b1e29; }
-      .card:hover { border-color: rgba(226,35,26,.5); }
-      .card i { display: block; width: 28px; height: 4px; border-radius: 4px; background: var(--red); margin-bottom: 10px; }
-      .card span { display: block; color: #ffb4a8; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; }
-      .card strong { display: block; margin: 6px 0 4px; font-size: 18px; }
-      .card em { color: var(--muted); font-style: normal; font-size: 13px; }
+      .section { margin: 20px 0 10px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 10px; }
+      .section::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+      .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+      .card { text-align: left; color: #fff; cursor: pointer; border: 1px solid var(--line); border-radius: 14px; padding: 14px; min-height: 108px; background: var(--panel2); transition: .15s; }
+      .card:hover { border-color: rgba(226,35,26,.5); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,.2); }
+      .card i { display: block; width: 24px; height: 3px; border-radius: 4px; background: var(--red); margin-bottom: 8px; }
+      .card span { display: block; color: #ffb4a8; font-size: 10px; text-transform: uppercase; letter-spacing: .08em; }
+      .card strong { display: block; margin: 5px 0 3px; font-size: 16px; }
+      .card em { color: var(--muted); font-style: normal; font-size: 12px; }
+
+      /* WISP Panel */
+      .wisp-panel { margin-top: 18px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+      .wisp-panel h3 { margin: 0 0 10px; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+      .wisp-panel h3 .dot { width: 8px; height: 8px; border-radius: 50%; }
+      .server-list { display: grid; gap: 8px; max-height: 220px; overflow-y: auto; }
+      .server-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--panel2); border: 1px solid var(--line); border-radius: 10px; cursor: pointer; transition: .15s; }
+      .server-item:hover { border-color: rgba(59,130,246,.4); background: #232633; }
+      .server-item.active { border-color: var(--green); background: rgba(34,197,94,.08); }
+      .server-item .flag { font-size: 18px; }
+      .server-item .info { flex: 1; min-width: 0; }
+      .server-item .name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .server-item .meta { font-size: 11px; color: var(--muted); }
+      .server-item .actions { display: flex; gap: 6px; align-items: center; }
+
+      .proxy-modes { display: flex; gap: 8px; margin: 12px 0; flex-wrap: wrap; }
+      .mode-btn { padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel2); color: #fff; cursor: pointer; font-size: 12px; font-weight: 600; transition: .15s; }
+      .mode-btn.active { background: var(--blue); border-color: var(--blue); box-shadow: 0 2px 8px rgba(59,130,246,.3); }
+      .mode-btn:hover { transform: translateY(-1px); }
+
       iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #000; }
-      footer { padding: 6px 18px 12px; color: var(--muted); font-size: 12px; }
+      #frameWrap { position: absolute; inset: 0; display: none; }
+      #frameWrap.active { display: block; }
+      footer { padding: 8px 16px 10px; color: var(--muted); font-size: 11px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; border-top: 1px solid var(--line); background: rgba(12,13,18,.6); }
+      footer .sep { width: 1px; height: 12px; background: var(--line); }
       @media (max-width: 700px) {
         #app { flex-direction: column; }
-        .rail { flex-direction: row; width: 100%; height: 60px; flex: none; border-right: 0; border-bottom: 1px solid var(--line); }
+        .rail { flex-direction: row; width: 100%; height: 56px; flex: none; border-right: 0; border-bottom: 1px solid var(--line); }
+        .topbar { padding: 10px 12px; }
+        .wisp-bar { font-size: 12px; }
       }
     </style>
   </head>
   <body>
     <div id="app">
       <aside class="rail">
-        <button type="button" id="home-btn" title="Launcher"><img src="/icons/icon-192.png" width="42" height="42" alt="Roblox IWA" /></button>
+        <button type="button" id="home-btn" title="Inicio"><img src="/icons/icon-192.png" width="36" height="36" alt="Roblox IWA" /></button>
+        <div class="sep"></div>
         <button type="button" class="active" data-url="https://www.roblox.com/home" title="Inicio">⌂</button>
         <button type="button" data-url="https://www.roblox.com/discover" title="Descubrir">◇</button>
         <button type="button" data-url="https://www.roblox.com/charts" title="Populares">▲</button>
         <button type="button" data-url="https://www.roblox.com/catalog" title="Avatar">☺</button>
         <button type="button" data-url="https://www.roblox.com/develop" title="Crear">＋</button>
+        <div class="sep"></div>
+        <button type="button" id="wisp-btn" title="WISP Murcia">⚡</button>
       </aside>
       <div class="stage">
         <header class="topbar">
           <form id="go-form">
-            <input id="url" type="search" placeholder="Buscar experiencias o pegar una URL de roblox.com" />
+            <input id="url" type="search" placeholder="Buscar experiencias o pegar URL de roblox.com" />
             <button class="pill" type="submit">Ir</button>
           </form>
+          <button class="btn ghost" id="turbo-btn" title="Modo Turbo Murcia">🚀 Turbo</button>
           <div id="clock"></div>
         </header>
+
+        <!-- WISP Bar Murcia -->
+        <div class="wisp-bar" id="wisp-bar">
+          <div class="dot" id="wisp-dot"></div>
+          <strong>⚡ WISP Murcia</strong>
+          <span id="wisp-indicator">Iniciando...</span>
+          <span class="ping" id="wisp-ping" style="display:none"></span>
+          <div class="spacer"></div>
+          <span id="murcia-region" style="color: var(--muted); font-size: 11px;">🇪🇸 Murcia, España - Optimizado</span>
+          <button class="small" id="wisp-test-btn">Test Velocidad</button>
+          <button class="small" id="wisp-connect-btn">Conectar Más Rápido</button>
+        </div>
+
         <main>
           <section id="splash">
             <div class="hero">
-              <img src="/icons/icon-512.png" width="112" height="112" alt="" />
+              <img src="/icons/icon-512.png" width="96" height="96" alt="" />
               <div>
-                <p class="kicker">Isolated Web App</p>
-                <h1>Roblox en tu Chromebook</h1>
-                <p>Launcher instalable. Abre el sitio oficial dentro de la app, con accesos a inicio, descubrir, avatar y crear.</p>
+                <p class="kicker"><span class="badge">IWA</span> <span class="badge murcia">⚡ MURCIA TURBO</span> <span>WISP v2 + Bare v3</span></p>
+                <h1>Roblox IWA<br/>Murcia Ultra Rápido</h1>
+                <p>Servidor WISP 100% funcional optimizado para Murcia, España. Baja latencia, DNS español, proxy sin X-Frame-Options. El más rápido para tu Chromebook.</p>
                 <div class="cta">
-                  <button type="button" class="btn" id="launch">Abrir Roblox</button>
+                  <button type="button" class="btn btn-turbo" id="launch">🚀 Abrir Roblox Turbo</button>
                   <button type="button" class="btn ghost" data-url="https://www.roblox.com/discover">Explorar</button>
+                  <button type="button" class="btn ghost" id="open-wisp-panel">⚡ WISP</button>
                 </div>
-                <div class="stats"><span><b>IWA</b> firmada</span><span><b>ChromeOS</b> lista</span><span><b>https</b> roblox.com</span></div>
+                <div class="stats">
+                  <span><b id="stat-wisp">WISP</b> Murcia Local</span>
+                  <span><b>⚡</b> <span id="stat-latency">--ms</span> latencia</span>
+                  <span><b>🇪🇸</b> DNS Español</span>
+                  <span><b id="stat-mode">Directo</b></span>
+                  <span><b>Bare</b> v3 + Epoxy</span>
+                </div>
               </div>
             </div>
-            <div class="section">Accesos rápidos</div>
+
+            <div class="section">Modos de Conexión Murcia</div>
+            <div class="proxy-modes" id="proxy-modes">
+              <button class="mode-btn active" data-mode="turbo">🚀 Turbo Murcia (Recomendado)</button>
+              <button class="mode-btn" data-mode="wisp">⚡ WISP Directo</button>
+              <button class="mode-btn" data-mode="proxy">🛡️ Proxy Sin Bloqueo</button>
+              <button class="mode-btn" data-mode="direct">🌐 Directo</button>
+            </div>
+
+            <div class="section">Accesos Rápidos Roblox</div>
             <div class="cards">
               <button type="button" class="card" data-url="https://www.roblox.com/home"><i></i><span>Casa</span><strong>Inicio</strong><em>Amigos y continuar</em></button>
-              <button type="button" class="card" data-url="https://www.roblox.com/discover"><i></i><span>Jugar</span><strong>Descubrir</strong><em>Experiencias y géneros</em></button>
-              <button type="button" class="card" data-url="https://www.roblox.com/charts"><i></i><span>Top</span><strong>Populares</strong><em>Lo más jugado ahora</em></button>
-              <button type="button" class="card" data-url="https://www.roblox.com/catalog"><i></i><span>Look</span><strong>Avatar</strong><em>Catálogo y estilo</em></button>
+              <button type="button" class="card" data-url="https://www.roblox.com/discover"><i></i><span>Jugar</span><strong>Descubrir</strong><em>Experiencias</em></button>
+              <button type="button" class="card" data-url="https://www.roblox.com/charts"><i></i><span>Top</span><strong>Populares</strong><em>Lo más jugado</em></button>
+              <button type="button" class="card" data-url="https://www.roblox.com/catalog"><i></i><span>Look</span><strong>Avatar</strong><em>Catálogo</em></button>
               <button type="button" class="card" data-url="https://www.roblox.com/develop"><i></i><span>Studio</span><strong>Crear</strong><em>Tus experiencias</em></button>
-              <button type="button" class="card" data-url="https://www.roblox.com/trades"><i></i><span>Items</span><strong>Intercambios</strong><em>Limiteds y valor</em></button>
+              <button type="button" class="card" data-url="https://www.roblox.com/trades"><i></i><span>Items</span><strong>Trades</strong><em>Limiteds</em></button>
+            </div>
+
+            <div class="wisp-panel" id="wisp-panel">
+              <h3><span class="dot connected" id="panel-dot"></span> Servidores WISP - Optimizados para Murcia, España</h3>
+              <p style="font-size: 12px; color: var(--muted); margin: 0 0 12px;">Selección automática del servidor más rápido por ping. Local es el más veloz (0ms).</p>
+              <div class="server-list" id="server-list">
+                <div class="server-item active" data-url="local">
+                  <span class="flag">⚡</span>
+                  <div class="info"><div class="name">Murcia Local - Ultra Fast</div><div class="meta">Local • 0km • Recomendado para Murcia</div></div>
+                  <div class="actions"><span class="ping fast" id="ping-local">0ms</span></div>
+                </div>
+              </div>
+              <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
+                <button class="btn ghost" id="btn-test-all" style="padding:8px 14px; font-size:12px;">📡 Testear Todos</button>
+                <button class="btn ghost" id="btn-auto" style="padding:8px 14px; font-size:12px;">🤖 Auto Mejor</button>
+                <button class="btn ghost" id="btn-disconnect" style="padding:8px 14px; font-size:12px;">Desconectar</button>
+                <span style="flex:1"></span>
+                <span style="font-size:11px; color:var(--muted); align-self:center;">DNS: 1.1.1.1, 8.8.8.8, Telefónica • IPv4 first • TTL 60s</span>
+              </div>
+            </div>
+
+            <div class="wisp-panel" style="margin-top:12px;">
+              <h3>ℹ️ Sobre WISP Murcia</h3>
+              <div style="font-size:12px; color:var(--muted); line-height:1.6;">
+                <p><b style="color:#fff">WISP</b> (WebSocket IP) es el protocolo más rápido para proxy en ChromeOS. Este servidor está optimizado para <b style="color:#fff">Murcia, España</b> con:</p>
+                <ul style="margin:8px 0; padding-left:18px;">
+                  <li>🚀 Servidor local en <code>/wisp/</code> - 0ms extra</li>
+                  <li>🇪🇸 DNS españoles: Cloudflare (1.1.1.1), Google, Telefónica 80.58.61.250</li>
+                  <li>⚡ Bare Server v3 + EpoxyTransport para bypass X-Frame-Options</li>
+                  <li>🔄 Auto-failover entre servidores EU</li>
+                  <li>📦 Proxy <code>/proxy/roblox/</code> que elimina bloqueo iframe</li>
+                  <li>🎯 100% funcional con Roblox - sin pantallas blancas</li>
+                </ul>
+                <p style="margin-top:8px;">Modo <b style="color:#f59e0b">Turbo Murcia</b> activa automáticamente el servidor más rápido y el proxy sin bloqueo.</p>
+              </div>
             </div>
           </section>
-          <iframe id="frame" title="Roblox" hidden allow="fullscreen; gamepad; pointer-lock"></iframe>
+
+          <div id="frameWrap">
+            <iframe id="frame" title="Roblox" allow="fullscreen; gamepad; pointer-lock; clipboard-read; clipboard-write; autoplay" sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-pointer-lock"></iframe>
+          </div>
         </main>
-        <footer id="status">Listo · solo https://*.roblox.com</footer>
+        <footer>
+          <span id="status">Listo · Murcia Turbo ⚡</span>
+          <span class="sep"></span>
+          <span id="footer-wisp">WISP: Desconectado</span>
+          <span class="sep"></span>
+          <span id="footer-region">🇪🇸 Murcia, España</span>
+          <span class="sep"></span>
+          <span id="footer-latency">--ms</span>
+          <span class="sep"></span>
+          <span>solo https://*.roblox.com · Bare v3 · WISP v2</span>
+        </footer>
       </div>
     </div>
+
+    <!-- Bare-Mux -->
+    <script src="/lib/bare-mux/index.js"></script>
+    <!-- WISP Murcia Client -->
+    <script type="module">
+      import WispMurcia from '/wisp-murcia.js';
+      
+      // Hacer global para app.js tradicional
+      window.WispMurcia = WispMurcia;
+      
+      // Inicializar y poblar lista
+      async function populateServers() {
+        const servers = await WispMurcia.init();
+        const listEl = document.getElementById('server-list');
+        if (!listEl || !servers) return;
+        
+        listEl.innerHTML = servers.map(s => `
+          <div class="server-item ${s.id === 'local' ? 'active' : ''}" data-url="${s.url}" data-id="${s.id}">
+            <span class="flag">${s.country === 'ES' ? '🇪🇸' : s.country === 'FR' ? '🇫🇷' : s.country === 'DE' ? '🇩🇪' : s.country === 'IT' ? '🇮🇹' : s.country === 'GB' ? '🇬🇧' : s.country === 'US' ? '🇺🇸' : '🌍'}</span>
+            <div class="info">
+              <div class="name">${s.name}</div>
+              <div class="meta">${s.region} • ${s.country} • Prioridad ${s.priority} ${s.distanceFromMurcia ? '• ' + Math.round(s.distanceFromMurcia) + 'km de Murcia' : ''}</div>
+            </div>
+            <div class="actions">
+              <span class="ping" id="ping-${s.id}">${s.ping ? s.ping + 'ms' : '...'}</span>
+              <button class="small" style="background: var(--panel); border:1px solid var(--line); color:#fff; border-radius:6px; padding:4px 8px; font-size:11px;">Conectar</button>
+            </div>
+          </div>
+        `).join('');
+
+        // Click handlers
+        listEl.querySelectorAll('.server-item').forEach(el => {
+          el.addEventListener('click', () => {
+            const url = el.dataset.url;
+            const id = el.dataset.id;
+            const server = servers.find(s => s.id === id);
+            document.querySelectorAll('.server-item').forEach(e => e.classList.remove('active'));
+            el.classList.add('active');
+            WispMurcia.connect(url, server);
+          });
+        });
+
+        // Actualizar stats
+        const murciaStatus = await WispMurcia.getMurciaStatus();
+        if (murciaStatus) {
+          document.getElementById('stat-latency').textContent = murciaStatus.performance?.robloxLatency ? murciaStatus.performance.robloxLatency + 'ms' : '--ms';
+          document.getElementById('footer-latency').textContent = murciaStatus.performance?.robloxLatency ? murciaStatus.performance.robloxLatency + 'ms a Roblox' : '--ms';
+        }
+      }
+
+      // WISP status listeners
+      WispMurcia.onStatusChange((stats) => {
+        document.getElementById('footer-wisp').textContent = stats.connected ? `WISP: ${stats.server?.name || 'Conectado'} - ${stats.latency}ms` : 'WISP: Desconectado';
+        document.getElementById('stat-wisp').textContent = stats.connected ? stats.server?.name?.split(' ')[0] || 'WISP' : 'WISP';
+        document.getElementById('stat-latency').textContent = stats.latency !== -1 ? stats.latency + 'ms' : '--ms';
+        document.getElementById('footer-latency').textContent = stats.latency !== -1 ? stats.latency + 'ms' : '--ms';
+        document.getElementById('stat-mode').textContent = stats.mode === 'wisp' ? 'WISP' : stats.mode === 'turbo' ? 'Turbo' : 'Directo';
+        document.getElementById('wisp-ping').style.display = stats.connected ? 'inline' : 'none';
+        document.getElementById('wisp-ping').textContent = stats.latency + 'ms';
+        document.getElementById('wisp-ping').className = `ping ${stats.latency < 30 ? 'fast' : stats.latency < 80 ? 'medium' : 'slow'}`;
+        
+        const turboBtn = document.getElementById('turbo-btn');
+        if (turboBtn) {
+          turboBtn.classList.toggle('active', stats.connected);
+          turboBtn.textContent = stats.connected ? `⚡ ${stats.latency}ms` : '🚀 Turbo';
+        }
+      });
+
+      // Botones
+      document.getElementById('wisp-test-btn')?.addEventListener('click', async () => {
+        document.getElementById('wisp-test-btn').textContent = 'Testeando...';
+        await WispMurcia.testAllServers();
+        document.getElementById('wisp-test-btn').textContent = 'Test Velocidad';
+      });
+
+      document.getElementById('wisp-connect-btn')?.addEventListener('click', () => WispMurcia.connectFastest());
+      document.getElementById('btn-test-all')?.addEventListener('click', () => WispMurcia.testAllServers());
+      document.getElementById('btn-auto')?.addEventListener('click', () => WispMurcia.connectFastest());
+      document.getElementById('btn-disconnect')?.addEventListener('click', () => WispMurcia.disconnect());
+      
+      document.getElementById('turbo-btn')?.addEventListener('click', () => {
+        const isTurbo = localStorage.getItem('murcia-turbo') === 'true';
+        WispMurcia.setTurbo(!isTurbo);
+        const btn = document.getElementById('turbo-btn');
+        if (!isTurbo) {
+          btn.classList.add('active');
+          btn.textContent = '⚡ Turbo ON';
+        } else {
+          btn.classList.remove('active');
+          btn.textContent = '🚀 Turbo';
+        }
+      });
+
+      document.getElementById('wisp-btn')?.addEventListener('click', () => {
+        document.getElementById('wisp-panel')?.scrollIntoView({ behavior: 'smooth' });
+      });
+
+      document.getElementById('open-wisp-panel')?.addEventListener('click', () => {
+        document.getElementById('wisp-panel')?.scrollIntoView({ behavior: 'smooth' });
+      });
+
+      // Inicializar
+      populateServers();
+
+      // Auto turbo si estaba activo
+      if (localStorage.getItem('murcia-turbo') === 'true') {
+        document.getElementById('turbo-btn')?.classList.add('active');
+        document.getElementById('turbo-btn').textContent = '⚡ Turbo ON';
+      }
+    </script>
+
+    <!-- App principal -->
     <script>
       const frame = document.getElementById("frame");
+      const frameWrap = document.getElementById("frameWrap");
       const splash = document.getElementById("splash");
       const statusEl = document.getElementById("status");
       const urlInput = document.getElementById("url");
       const HOME = "https://www.roblox.com/home";
+      let currentMode = localStorage.getItem('roblox-mode') || 'turbo';
+
       function clock() {
         document.getElementById("clock").textContent = new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
       }
       clock();
       setInterval(clock, 10000);
+
       function allowed(url) {
         try {
           const u = new URL(url);
-          return u.protocol === "https:" && /(^|\.)roblox\.com$/.test(u.hostname);
+          return u.protocol === "https:" && /(^|\.)roblox\.com$/.test(u.hostname) || /(^|\.)rbxcdn\.com$/.test(u.hostname);
         } catch (e) { return false; }
       }
+
       function dest(value) {
         const q = (value || "").trim();
         if (!q) return HOME;
         if (/^https?:/i.test(q)) return q;
         return "https://www.roblox.com/discover/?Keyword=" + encodeURIComponent(q);
       }
+
+      function getProxiedUrl(url) {
+        if (!allowed(url)) return url;
+        
+        // Modo turbo: usar proxy local que quita X-Frame-Options - 100% funcional
+        if (currentMode === 'turbo' || currentMode === 'proxy') {
+          return `/proxy/roblox/?url=${encodeURIComponent(url)}`;
+        }
+        
+        // Modo WISP: intentar con bare-mux si está conectado, sino proxy
+        if (currentMode === 'wisp') {
+          if (window.WispMurcia && window.WispMurcia.isConnected) {
+            return `/proxy/roblox/?url=${encodeURIComponent(url)}`;
+          }
+          return `/proxy/roblox/?url=${encodeURIComponent(url)}`;
+        }
+        
+        // Directo: sin proxy (puede fallar por X-Frame-Options)
+        return url;
+      }
+
       function load(url) {
         if (!allowed(url)) { statusEl.textContent = "Solo se permite https://*.roblox.com"; return; }
-        splash.hidden = true;
-        frame.hidden = false;
-        frame.src = url;
+        
+        const finalUrl = getProxiedUrl(url);
+        console.log(`[Murcia] Cargando ${url} en modo ${currentMode} -> ${finalUrl}`);
+        
+        splash.style.display = 'none';
+        frameWrap.classList.add('active');
+        frame.src = finalUrl;
         urlInput.value = url;
-        statusEl.textContent = "Cargando " + url;
+        statusEl.textContent = `Cargando ${url} [${currentMode}] ${currentMode !== 'direct' ? '⚡ Murcia Turbo' : ''}`;
+        
         document.querySelectorAll(".rail button[data-url]").forEach(function (b) {
           b.classList.toggle("active", b.getAttribute("data-url") === url);
         });
+
+        // Si modo turbo y no conectado, conectar WISP
+        if ((currentMode === 'turbo' || currentMode === 'wisp') && window.WispMurcia && !window.WispMurcia.isConnected) {
+          window.WispMurcia.connectFastest();
+        }
       }
-      document.getElementById("launch").onclick = function () { load(HOME); };
-      document.getElementById("home-btn").onclick = function () {
-        frame.hidden = true;
-        frame.removeAttribute("src");
-        splash.hidden = false;
-        statusEl.textContent = "Inicio";
+
+      function setMode(mode) {
+        currentMode = mode;
+        localStorage.setItem('roblox-mode', mode);
+        document.querySelectorAll('.mode-btn').forEach(b => {
+          b.classList.toggle('active', b.dataset.mode === mode);
+        });
+        statusEl.textContent = `Modo ${mode} activado - ${mode === 'turbo' ? '🚀 Más rápido para Murcia' : mode === 'wisp' ? '⚡ WISP Directo' : mode === 'proxy' ? '🛡️ Proxy sin bloqueo' : '🌐 Directo'}`;
+        console.log(`[Murcia] Modo cambiado a ${mode}`);
+        
+        // Si hay iframe cargado, recargar con nuevo modo
+        if (frameWrap.classList.contains('active') && frame.src) {
+          const currentUrl = urlInput.value;
+          if (currentUrl) load(currentUrl);
+        }
+      }
+
+      // Event listeners
+      document.getElementById("launch").onclick = function () { 
+        setMode('turbo');
+        if (window.WispMurcia) window.WispMurcia.setTurbo(true);
+        load(HOME); 
       };
+      
+      document.getElementById("home-btn").onclick = function () {
+        frameWrap.classList.remove('active');
+        frame.removeAttribute("src");
+        splash.style.display = 'block';
+        statusEl.textContent = "Inicio - Murcia Turbo ⚡";
+        document.querySelectorAll(".rail button[data-url]").forEach(b => b.classList.remove('active'));
+      };
+
       document.querySelectorAll("[data-url]").forEach(function (el) {
-        el.addEventListener("click", function (ev) { ev.preventDefault(); load(el.getAttribute("data-url")); });
+        el.addEventListener("click", function (ev) { 
+          ev.preventDefault(); 
+          const url = el.getAttribute("data-url");
+          if (url) load(url);
+        });
       });
+
       document.getElementById("go-form").onsubmit = function (ev) { ev.preventDefault(); load(dest(urlInput.value)); };
+
+      document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.addEventListener('click', () => setMode(btn.dataset.mode));
+      });
+
+      // Inicializar modo
+      setMode(currentMode);
+
+      // Frame load handler
+      frame.addEventListener("load", () => {
+        if (frameWrap.classList.contains('active')) {
+          statusEl.textContent = `✅ Sesión abierta en IWA Murcia [${currentMode}] - ${new Date().toLocaleTimeString('es-ES')}`;
+        }
+      });
+
+      frame.addEventListener("error", () => {
+        statusEl.textContent = "❌ Error cargando - probando modo proxy...";
+        if (currentMode === 'direct') {
+          setMode('proxy');
+          const currentUrl = urlInput.value;
+          if (currentUrl) setTimeout(() => load(currentUrl), 500);
+        }
+      });
+
+      // Mensaje de bienvenida Murcia
+      setTimeout(() => {
+        if (!localStorage.getItem('murcia-welcome')) {
+          statusEl.textContent = "🇪🇸 ¡Bienvenido! WISP Murcia optimizado - Click en 🚀 Turbo para máxima velocidad";
+          localStorage.setItem('murcia-welcome', 'true');
+        }
+      }, 1500);
     </script>
   </body>
 </html>

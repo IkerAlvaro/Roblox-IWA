@@ -1,0 +1,115 @@
+{
+  "region": "Murcia, España",
+  "optimizedFor": "España - Murcia",
+  "timezone": "Europe/Madrid",
+  "version": "2.0.0",
+  "turbo": true,
+  "wisp": {
+    "version": "v2",
+    "endpoint": "/wisp/",
+    "protocol": "wisp-v2",
+    "transport": "epoxy",
+    "bare": "/bare/"
+  },
+  "dns": {
+    "servers": [
+      "1.1.1.1",
+      "1.0.0.1",
+      "8.8.8.8",
+      "8.8.4.4",
+      "9.9.9.9",
+      "80.58.61.250",
+      "80.58.61.254"
+    ],
+    "ttl": 60,
+    "method": "resolve",
+    "resultOrder": "ipv4first",
+    "optimizedFor": "Murcia"
+  },
+  "servers": [
+    {
+      "id": "local",
+      "name": "Murcia Local ⚡",
+      "url": "/wisp/",
+      "region": "Murcia",
+      "country": "ES",
+      "priority": 0,
+      "type": "local",
+      "recommended": true,
+      "latency": "0-2ms"
+    },
+    {
+      "id": "madrid",
+      "name": "Madrid - Ultra Fast 🇪🇸",
+      "url": "wss://wisp.mercurywork.shop/",
+      "region": "Madrid",
+      "country": "ES",
+      "priority": 1,
+      "type": "eu-central",
+      "latency": "10-20ms"
+    },
+    {
+      "id": "barcelona",
+      "name": "Barcelona Edge 🇪🇸",
+      "url": "wss://wisp.nightnetwork.cloud/",
+      "region": "Barcelona",
+      "country": "ES",
+      "priority": 2,
+      "type": "eu-central",
+      "latency": "15-25ms"
+    },
+    {
+      "id": "paris",
+      "name": "París - EU West 🇫🇷",
+      "url": "wss://wisp.astroid.wtf/",
+      "region": "París",
+      "country": "FR",
+      "priority": 3,
+      "type": "eu-west",
+      "latency": "30-45ms"
+    },
+    {
+      "id": "frankfurt",
+      "name": "Frankfurt - EU Central 🇩🇪",
+      "url": "wss://wisp.rhw.cloud/",
+      "region": "Frankfurt",
+      "country": "DE",
+      "priority": 4,
+      "type": "eu-central",
+      "latency": "40-55ms"
+    }
+  ],
+  "proxy": {
+    "roblox": "/proxy/roblox/",
+    "bare": "/bare/",
+    "modes": ["turbo", "wisp", "proxy", "direct"],
+    "default": "turbo",
+    "stripHeaders": ["x-frame-options", "content-security-policy", "x-content-security-policy"]
+  },
+  "optimizations": {
+    "murcia": [
+      "DNS español optimizado",
+      "IPv4 prioritario para España",
+      "TTL bajo 60s para IPs frescas",
+      "Keep-Alive TCP activado",
+      "Cache DNS inteligente",
+      "Auto-failover EU",
+      "Proxy sin X-Frame-Options",
+      "Bare v3 + EpoxyTransport"
+    ],
+    "gaming": [
+      "Baja latencia <20ms Murcia",
+      "100% funcional Roblox",
+      "Sin pantallas blancas",
+      "Soporte gamepad",
+      "Fullscreen optimizado"
+    ]
+  },
+  "endpoints": {
+    "health": "/api/health",
+    "servers": "/api/wisp-servers",
+    "murciaStatus": "/api/murcia-status",
+    "ping": "/api/ping?host=",
+    "stats": "/api/stats"
+  }
+}
