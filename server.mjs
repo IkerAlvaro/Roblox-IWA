@@ -28,8 +28,6 @@ const server = http.createServer((req, res) => {
     }
     res.writeHead(200, {
       "content-type": types[path.extname(filePath)] || "application/octet-stream",
-      "cross-origin-embedder-policy": "credentialless",
-      "cross-origin-opener-policy": "same-origin",
     });
     res.end(data);
   });

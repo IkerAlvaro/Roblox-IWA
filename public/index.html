@@ -7,106 +7,146 @@
     <title>Roblox IWA</title>
     <link rel="manifest" href="/.well-known/manifest.webmanifest" />
     <link rel="icon" href="/icons/icon-192.png" />
-    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      html, body { margin: 0; height: 100%; background: #0c0d12; color: #f6f7fb; font-family: system-ui, "Segoe UI", sans-serif; }
+      #app { display: flex; height: 100%; }
+      .rail { width: 72px; flex: 0 0 72px; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 12px 8px; background: #101218; border-right: 1px solid #2a2d38; }
+      .rail img { width: 40px; height: 40px; border-radius: 10px; object-fit: cover; display: block; }
+      .rail button { width: 44px; height: 44px; border: 0; border-radius: 12px; background: transparent; color: #fff; cursor: pointer; font-size: 18px; }
+      .rail button.active, .rail button:hover { background: #e2231a; }
+      .stage { flex: 1; min-width: 0; display: flex; flex-direction: column; height: 100%; }
+      .topbar { display: flex; gap: 12px; padding: 12px 16px; align-items: center; }
+      #go-form { flex: 1; display: flex; gap: 8px; background: #1a1c24; border: 1px solid #2a2d38; border-radius: 999px; padding: 6px 6px 6px 14px; }
+      #url { flex: 1; border: 0; background: transparent; color: #fff; outline: none; }
+      button.pill, .btn { border: 0; border-radius: 999px; padding: 10px 16px; cursor: pointer; font-weight: 600; background: #e2231a; color: #fff; }
+      .ghost { background: #2a2d38; color: #fff; text-decoration: none; display: inline-block; }
+      #clock { color: #9aa3b5; min-width: 64px; text-align: right; }
+      main { flex: 1; min-height: 0; margin: 0 16px 12px; border: 1px solid #2a2d38; border-radius: 18px; position: relative; overflow: auto; background: #12141c; }
+      #splash { padding: 24px; }
+      .hero { display: flex; gap: 20px; align-items: center; background: #1a1c26; border-radius: 16px; padding: 24px; flex-wrap: wrap; }
+      .hero img { width: 120px; height: 120px; border-radius: 24px; object-fit: cover; }
+      h1 { margin: 0 0 8px; font-size: 32px; }
+      p { color: #9aa3b5; line-height: 1.45; }
+      .cta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+      .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin-top: 18px; }
+      .card { text-align: left; background: #1f2230; color: #fff; border: 1px solid #2a2d38; border-radius: 14px; padding: 14px; cursor: pointer; min-height: 110px; }
+      .card span { display: block; color: #ffb4a8; font-size: 11px; text-transform: uppercase; }
+      .card strong { display: block; margin: 6px 0; font-size: 18px; }
+      .card em { color: #9aa3b5; font-style: normal; font-size: 13px; }
+      iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #000; }
+      footer { padding: 8px 16px 12px; color: #9aa3b5; font-size: 12px; }
+      @media (max-width: 700px) {
+        #app { flex-direction: column; }
+        .rail { flex-direction: row; width: 100%; height: 58px; }
+      }
+    </style>
   </head>
   <body>
     <div id="app">
       <aside class="rail">
-        <button type="button" class="logo" id="home-btn" title="Inicio">
-          <img src="/icons/icon-192.png" alt="Roblox IWA" />
-        </button>
-        <nav>
-          <button type="button" data-url="https://www.roblox.com/home" class="active" title="Inicio">⌂</button>
-          <button type="button" data-url="https://www.roblox.com/discover" title="Descubrir">◇</button>
-          <button type="button" data-url="https://www.roblox.com/charts" title="Populares">▲</button>
-          <button type="button" data-url="https://www.roblox.com/catalog" title="Avatar">☺</button>
-          <button type="button" data-url="https://www.roblox.com/develop" title="Crear">＋</button>
-        </nav>
-        <button type="button" id="fullscreen" title="Pantalla completa">⛶</button>
+        <button type="button" id="home-btn" title="Inicio"><img src="/icons/icon-192.png" width="40" height="40" alt="Roblox IWA" /></button>
+        <button type="button" class="active" data-url="https://www.roblox.com/home" title="Inicio">⌂</button>
+        <button type="button" data-url="https://www.roblox.com/discover" title="Descubrir">◇</button>
+        <button type="button" data-url="https://www.roblox.com/charts" title="Populares">▲</button>
+        <button type="button" data-url="https://www.roblox.com/catalog" title="Avatar">☺</button>
+        <button type="button" data-url="https://www.roblox.com/develop" title="Crear">＋</button>
       </aside>
-
       <div class="stage">
         <header class="topbar">
           <form id="go-form">
-            <span class="search-ico">⌕</span>
-            <input id="url" type="search" spellcheck="false" placeholder="Buscar en Roblox o pegar una URL…" />
-            <button type="submit">Ir</button>
+            <input id="url" type="search" placeholder="Buscar o pegar https://www.roblox.com/..." />
+            <button class="pill" type="submit">Ir</button>
           </form>
-          <div class="clock" id="clock"></div>
+          <div id="clock"></div>
         </header>
-
         <main>
           <section id="splash">
             <div class="hero">
-              <div class="hero-copy">
-                <p class="kicker">Isolated Web App · ChromeOS</p>
-                <h1>Juega desde una app,<br />no desde una pestaña.</h1>
-                <p class="lede">
-                  Cliente instalable con origen <code>isolated-app://</code>.
-                  Abre el sitio oficial de Roblox en su propio marco.
-                </p>
+              <img src="/icons/icon-512.png" width="120" height="120" alt="" />
+              <div>
+                <h1>Roblox IWA</h1>
+                <p>App aislada para ChromeOS. Abre el sitio oficial de Roblox aquí mismo.</p>
                 <div class="cta">
-                  <button type="button" id="launch" class="btn-primary">Abrir Roblox</button>
-                  <a class="btn-ghost" href="https://www.roblox.com/discover" id="discover-link">Explorar experiencias</a>
+                  <button type="button" class="btn" id="launch">Abrir Roblox</button>
+                  <button type="button" class="btn ghost" data-url="https://www.roblox.com/discover">Descubrir</button>
                 </div>
               </div>
-              <div class="hero-art">
-                <img src="/icons/icon-512.png" alt="" />
-                <div class="orb"></div>
-              </div>
             </div>
-
-            <h2 class="section-title">Accesos rápidos</h2>
             <div class="cards">
-              <button type="button" class="card" data-url="https://www.roblox.com/home">
-                <span class="tag">Casa</span>
-                <strong>Inicio</strong>
-                <em>Amigos, continuar y destacados</em>
-              </button>
-              <button class="card" data-url="https://www.roblox.com/discover">
-                <span class="tag">Jugar</span>
-                <strong>Descubrir</strong>
-                <em>Experiencias y géneros</em>
-              </button>
-              <button class="card" data-url="https://www.roblox.com/charts">
-                <span class="tag">Top</span>
-                <strong>Populares</strong>
-                <em>Lo que más se juega ahora</em>
-              </button>
-              <button class="card" data-url="https://www.roblox.com/catalog">
-                <span class="tag">Look</span>
-                <strong>Avatar</strong>
-                <em>Catálogo y estilo</em>
-              </button>
-              <button class="card" data-url="https://www.roblox.com/develop">
-                <span class="tag">Studio</span>
-                <strong>Crear</strong>
-                <em>Experiencias y creaciones</em>
-              </button>
-              <button class="card" data-url="https://www.roblox.com/trades">
-                <span class="tag">Items</span>
-                <strong>Intercambios</strong>
-                <em>Limiteds y valor</em>
-              </button>
+              <button type="button" class="card" data-url="https://www.roblox.com/home"><span>Casa</span><strong>Inicio</strong><em>Amigos y continuar</em></button>
+              <button type="button" class="card" data-url="https://www.roblox.com/discover"><span>Jugar</span><strong>Descubrir</strong><em>Experiencias</em></button>
+              <button type="button" class="card" data-url="https://www.roblox.com/charts"><span>Top</span><strong>Populares</strong><em>Lo más jugado</em></button>
+              <button type="button" class="card" data-url="https://www.roblox.com/catalog"><span>Look</span><strong>Avatar</strong><em>Catálogo</em></button>
+              <button type="button" class="card" data-url="https://www.roblox.com/develop"><span>Studio</span><strong>Crear</strong><em>Experiencias</em></button>
+              <button type="button" class="card" data-url="https://www.roblox.com/trades"><span>Items</span><strong>Intercambios</strong><em>Limiteds</em></button>
             </div>
           </section>
-
-          <iframe
-            id="frame"
-            title="Roblox"
-            allow="fullscreen; gamepad; pointer-lock; clipboard-read; clipboard-write"
-            referrerpolicy="no-referrer-when-downgrade"
-            hidden
-          ></iframe>
+          <iframe id="frame" title="Roblox" hidden allow="fullscreen; gamepad; pointer-lock"></iframe>
         </main>
-
-        <footer>
-          <span id="status">Listo</span>
-          <span class="sep">·</span>
-          <span>Solo https://*.roblox.com</span>
-        </footer>
+        <footer id="status">Listo · solo https://*.roblox.com</footer>
       </div>
     </div>
-    <script src="/app.js" type="module"></script>
+    <script>
+      const frame = document.getElementById("frame");
+      const splash = document.getElementById("splash");
+      const statusEl = document.getElementById("status");
+      const urlInput = document.getElementById("url");
+      const HOME = "https://www.roblox.com/home";
+
+      function clock() {
+        document.getElementById("clock").textContent = new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
+      }
+      clock();
+      setInterval(clock, 10000);
+
+      function allowed(url) {
+        try {
+          const u = new URL(url);
+          return u.protocol === "https:" && /(^|\.)roblox\.com$/.test(u.hostname);
+        } catch (e) {
+          return false;
+        }
+      }
+
+      function dest(value) {
+        const q = (value || "").trim();
+        if (!q) return HOME;
+        if (/^https?:/i.test(q)) return q;
+        return "https://www.roblox.com/discover/?Keyword=" + encodeURIComponent(q);
+      }
+
+      function load(url) {
+        if (!allowed(url)) {
+          statusEl.textContent = "Solo se permite https://*.roblox.com";
+          return;
+        }
+        splash.hidden = true;
+        frame.hidden = false;
+        frame.src = url;
+        urlInput.value = url;
+        statusEl.textContent = "Cargando " + url;
+        document.querySelectorAll(".rail button[data-url]").forEach(function (b) {
+          b.classList.toggle("active", b.getAttribute("data-url") === url);
+        });
+      }
+
+      document.getElementById("launch").onclick = function () { load(HOME); };
+      document.getElementById("home-btn").onclick = function () {
+        frame.hidden = true;
+        frame.removeAttribute("src");
+        splash.hidden = false;
+        statusEl.textContent = "Inicio";
+      };
+      document.querySelectorAll("[data-url]").forEach(function (el) {
+        el.addEventListener("click", function (ev) {
+          ev.preventDefault();
+          load(el.getAttribute("data-url"));
+        });
+      });
+      document.getElementById("go-form").onsubmit = function (ev) {
+        ev.preventDefault();
+        load(dest(urlInput.value));
+      };
+    </script>
   </body>
 </html>

@@ -3,7 +3,7 @@
   "name": "Roblox IWA",
   "short_name": "Roblox",
   "description": "Cliente Isolated Web App de Roblox para ChromeOS.",
-  "start_url": "/",
+  "start_url": "/index.html",
   "scope": "/",
   "display": "standalone",
   "display_override": ["borderless", "standalone"],
