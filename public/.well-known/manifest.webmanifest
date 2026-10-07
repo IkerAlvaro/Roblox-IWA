@@ -1,5 +1,6 @@
 {
   "id": "/",
+  "version": "1.0.0",
   "name": "Roblox IWA",
   "short_name": "Roblox",
   "description": "Cliente Isolated Web App de Roblox para ChromeOS.",
