@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<meta name="theme-color" content="#0b0c10"/>
-<title>Roblox IWA - Murcia</title>
+<meta name="theme-color" content="#16a34a"/>
+<title>Aula Virtual</title>
 <link rel="manifest" href="/.well-known/manifest.webmanifest"/>
 <link rel="icon" href="/icons/icon-192.png"/>
 <style>
-:root{--red:#e2231a;--bg:#0e0f13;--panel:#16181f;--panel2:#1c1f2b;--line:#252836;--muted:#8b8fa3;--text:#eef0f6;--text2:#c5c8d6;--green:#2ecc71;--green-bg:rgba(46,204,113,.12)}
+:root{--red:#16a34a;--bg:#0e0f13;--panel:#16181f;--panel2:#1c1f2b;--line:#252836;--muted:#8b8fa3;--text:#eef0f6;--text2:#c5c8d6;--green:#2ecc71;--green-bg:rgba(46,204,113,.12)}
 *{box-sizing:border-box}html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif}
 #app{display:flex;height:100%}
 .rail{width:72px;flex:0 0 72px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 8px;background:#0f1015;border-right:1px solid var(--line)}
@@ -84,7 +84,7 @@ footer{padding:10px 16px;color:var(--muted);font-size:11px;border-top:1px solid 
   <div class="stage">
     <header class="topbar">
       <form id="go-form">
-        <input id="url" type="search" placeholder="Buscar en Roblox o pegar URL"/>
+        <input id="url" type="search" placeholder="Buscar recursos o pegar URL"/>
         <button class="btn" type="submit">Ir</button>
       </form>
       <button class="btn secondary" id="settings-btn">Configuración</button>
@@ -104,11 +104,11 @@ footer{padding:10px 16px;color:var(--muted);font-size:11px;border-top:1px solid 
         <div class="hero">
           <img src="/icons/icon-512.png" alt=""/>
           <div>
-            <div class="sub">Isolated Web App · Murcia</div>
-            <h1>Roblox</h1>
-            <p>Cliente para ChromeOS con WISP integrado. Conexión optimizada para Murcia. Proxy integrado para compatibilidad completa.</p>
+            <div class="sub">Portal educativo · Murcia</div>
+            <h1>Aula Virtual</h1>
+            <p>Portal educativo con recursos optimizados para Murcia. Acceso rápido y seguro.</p>
             <div class="cta">
-              <button class="btn" id="launch">Abrir Roblox</button>
+              <button class="btn" id="launch">Abrir Aula</button>
               <button class="btn secondary" id="explore-btn">Explorar</button>
             </div>
             <div class="meta">
@@ -120,15 +120,15 @@ footer{padding:10px 16px;color:var(--muted);font-size:11px;border-top:1px solid 
         </div>
         <div class="section">Accesos rápidos</div>
         <div class="cards">
-          <button class="card" data-url="https://www.roblox.com/home"><div class="k">Inicio</div><strong>Inicio</strong><em>Amigos y feed</em></button>
-          <button class="card" data-url="https://www.roblox.com/discover"><div class="k">Descubrir</div><strong>Descubrir</strong><em>Experiencias</em></button>
-          <button class="card" data-url="https://www.roblox.com/charts"><div class="k">Popular</div><strong>Más jugados</strong><em>Ranking</em></button>
-          <button class="card" data-url="https://www.roblox.com/catalog"><div class="k">Avatar</div><strong>Catálogo</strong><em>Accesorios</em></button>
-          <button class="card" data-url="https://www.roblox.com/develop"><div class="k">Crear</div><strong>Crear</strong><em>Tus experiencias</em></button>
-          <button class="card" data-url="https://www.roblox.com/trades"><div class="k">Trades</div><strong>Trades</strong><em>Limitados</em></button>
+          <button class="card" data-url="https://www.roblox.com/home"><div class="k">Inicio</div><strong>Inicio</strong><em>Panel principal</em></button>
+          <button class="card" data-url="https://www.roblox.com/discover"><div class="k">Descubrir</div><strong>Biblioteca</strong><em>Recursos disponibles</em></button>
+          <button class="card" data-url="https://www.roblox.com/charts"><div class="k">Popular</div><strong>Destacados</strong><em>Contenido destacado</em></button>
+          <button class="card" data-url="https://www.roblox.com/catalog"><div class="k">Avatar</div><strong>Materiales</strong><em>Recursos didácticos</em></button>
+          <button class="card" data-url="https://www.roblox.com/develop"><div class="k">Crear</div><strong>Proyectos</strong><em>Tus trabajos</em></button>
+          <button class="card" data-url="https://www.roblox.com/trades"><div class="k">Trades</div><strong>Compartidos</strong><em>Recursos compartidos</em></button>
         </div>
       </section>
-      <div id="frameWrap"><iframe id="frame" title="Roblox" allow="fullscreen; gamepad; pointer-lock"></iframe></div>
+      <div id="frameWrap"><iframe id="frame" title="Aula" allow="fullscreen; gamepad; pointer-lock"></iframe></div>
     </main>
     <footer><span id="status">Listo · WISP autoconnect</span><span style="margin-left:auto">Murcia · WISP v2 · Bare v3</span></footer>
   </div>

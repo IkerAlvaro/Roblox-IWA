@@ -1,14 +1,14 @@
 {
   "id": "/",
-  "name": "Roblox IWA - Murcia WISP ⚡",
-  "short_name": "Roblox Murcia",
-  "description": "Cliente Isolated Web App de Roblox optimizado para Murcia, España. Servidor WISP ultra rápido, proxy sin bloqueo, 100% funcional.",
-  "version": "2.0.0",
+  "name": "Aula Virtual",
+  "short_name": "Aula",
+  "description": "Portal educativo - Recursos, herramientas de estudio y acceso a contenidos. Optimizado para Murcia.",
+  "version": "2.0.1",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#0b0c10",
-  "theme_color": "#e2231a",
+  "background_color": "#f8fafc",
+  "theme_color": "#16a34a",
   "icons": [
     {
       "src": "/icons/icon-192.png",
@@ -26,16 +26,5 @@
   "permissions_policy": {
     "cross-origin-isolated": ["self"]
   },
-  "isolated_storage": true,
-  "wisp": {
-    "enabled": true,
-    "endpoint": "/wisp/",
-    "region": "Murcia, España",
-    "optimized": true
-  },
-  "proxy": {
-    "bare": "/bare/",
-    "wisp": "/wisp/",
-    "roblox": "/proxy/roblox/"
-  }
+  "isolated_storage": true
 }
