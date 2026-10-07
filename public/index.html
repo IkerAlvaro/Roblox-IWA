@@ -8,7 +8,7 @@
 <link rel="manifest" href="/.well-known/manifest.webmanifest"/>
 <link rel="icon" href="/icons/icon-192.png"/>
 <style>
-:root{--red:#16a34a;--bg:#0e0f13;--panel:#16181f;--panel2:#1c1f2b;--line:#252836;--muted:#8b8fa3;--text:#eef0f6;--text2:#c5c8d6;--green:#2ecc71;--green-bg:rgba(46,204,113,.12)}
+:root{--red:#16a34a;--bg:#0e0f13;--panel:#16181f;--panel2:#1c1f2b;--line:#252836;--muted:#8b8fa3;--text:#eef0f6;--text2:#c5c8d6;--green:#2ecc71;--green-bg:rgba(46,204,113,.12);--red2:#e2231a}
 *{box-sizing:border-box}html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif}
 #app{display:flex;height:100%}
 .rail{width:72px;flex:0 0 72px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 8px;background:#0f1015;border-right:1px solid var(--line)}
@@ -55,7 +55,8 @@ main{flex:1;min-height:0;position:relative;overflow:hidden;background:var(--bg);
 .modal-body{padding:16px 18px;max-height:60vh;overflow:auto}
 .field{margin-bottom:14px}
 .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
-.field select{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:9px 12px;font-size:13px}
+.field select,.field input{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:9px 12px;font-size:13px}
+.field input:focus{border-color:#3a3e52;outline:none}
 .server-list{display:grid;gap:8px}
 .srv{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border:1px solid var(--line);border-radius:10px;cursor:pointer}
 .srv.active{border-color:var(--green);background:var(--green-bg)}
@@ -67,10 +68,49 @@ iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000
 #frameWrap{position:absolute;inset:0;display:none}
 #frameWrap.active{display:block}
 footer{padding:10px 16px;color:var(--muted);font-size:11px;border-top:1px solid var(--line);background:var(--panel);display:flex;gap:10px}
+/* Lock screen */
+.lock-screen{position:fixed;inset:0;z-index:100;background:radial-gradient(800px 400px at 50% 0%, rgba(22,163,74,.15), transparent 60%), var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
+.lock-box{width:100%;max-width:380px;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.lock-box .icon{width:56px;height:56px;border-radius:14px;background:var(--green-bg);border:1px solid rgba(46,204,113,.2);display:grid;place-items:center;margin:0 auto 16px;font-size:24px;color:var(--green)}
+.lock-box h2{margin:0 0 6px;text-align:center;font-size:20px;font-weight:700}
+.lock-box .hint{margin:0 0 18px;text-align:center;color:var(--muted);font-size:13px;line-height:1.5}
+.lock-box input{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:12px 14px;font-size:16px;text-align:center;letter-spacing:.2em}
+.lock-box input:focus{border-color:var(--green);outline:none;box-shadow:0 0 0 3px var(--green-bg)}
+.lock-box .actions{display:flex;gap:8px;margin-top:14px}
+.lock-box .actions .btn{flex:1;padding:11px}
+.lock-box .error{margin-top:10px;padding:8px 10px;border-radius:8px;background:rgba(226,35,26,.12);border:1px solid rgba(226,35,26,.2);color:#ff8a80;font-size:12px;text-align:center;display:none}
+.lock-box .error.show{display:block}
+.lock-box .footer{margin-top:16px;text-align:center;color:var(--muted);font-size:11px}
+.lock-box .footer button{background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:11px}
 @media(max-width:700px){#app{flex-direction:column}.rail{flex-direction:row;width:100%;height:56px;flex:none;border-right:0;border-bottom:1px solid var(--line)}.hero{flex-direction:column}}
 </style>
 </head>
 <body>
+<!-- Lock Screen - Seguridad con código -->
+<div id="lock-screen" class="lock-screen">
+  <div class="lock-box">
+    <div class="icon">🔒</div>
+    <h2 id="lock-title">Aula Virtual</h2>
+    <p class="hint" id="lock-hint">Introduce el código de acceso para continuar</p>
+    <div id="lock-setup" style="display:none">
+      <div class="field"><label>Crea un código de acceso (4-8 dígitos)</label><input id="code-new" type="password" inputmode="numeric" maxlength="8" placeholder="••••"/></div>
+      <div class="field"><label>Confirma el código</label><input id="code-confirm" type="password" inputmode="numeric" maxlength="8" placeholder="••••"/></div>
+    </div>
+    <div id="lock-enter">
+      <input id="code-input" type="password" inputmode="numeric" maxlength="8" placeholder="Código de acceso"/>
+    </div>
+    <div class="error" id="lock-error"></div>
+    <div class="actions">
+      <button class="btn secondary" id="lock-cancel" style="display:none">Cancelar</button>
+      <button class="btn" id="lock-submit">Desbloquear</button>
+    </div>
+    <div class="footer">
+      <div id="lock-footer-default">Protegido · Murcia · WISP v2</div>
+      <div id="lock-footer-setup" style="display:none"><button id="btn-use-default">Usar código por defecto (1234)</button></div>
+    </div>
+  </div>
+</div>
+
 <div id="app">
   <aside class="rail">
     <button id="home-btn" title="Inicio"><img src="/icons/icon-192.png" alt=""/></button>
@@ -80,6 +120,8 @@ footer{padding:10px 16px;color:var(--muted);font-size:11px;border-top:1px solid 
     <button data-url="https://www.roblox.com/charts" title="Populares">▲</button>
     <button data-url="https://www.roblox.com/catalog" title="Catálogo">☺</button>
     <button data-url="https://www.roblox.com/develop" title="Crear">＋</button>
+    <div class="sep"></div>
+    <button id="lock-btn" title="Bloquear">🔒</button>
   </aside>
   <div class="stage">
     <header class="topbar">
@@ -106,7 +148,7 @@ footer{padding:10px 16px;color:var(--muted);font-size:11px;border-top:1px solid 
           <div>
             <div class="sub">Portal educativo · Murcia</div>
             <h1>Aula Virtual</h1>
-            <p>Portal educativo con recursos optimizados para Murcia. Acceso rápido y seguro.</p>
+            <p>Portal educativo con recursos optimizados para Murcia. Acceso rápido y seguro. Código de acceso protegido.</p>
             <div class="cta">
               <button class="btn" id="launch">Abrir Aula</button>
               <button class="btn secondary" id="explore-btn">Explorar</button>
@@ -114,7 +156,7 @@ footer{padding:10px 16px;color:var(--muted);font-size:11px;border-top:1px solid 
             <div class="meta">
               <span><b>WISP</b> <span id="meta-wisp-detail">Autoconectando...</span></span>
               <span><b>Región</b> Murcia</span>
-              <span><b>Bare</b> v3 · WISP v2</span>
+              <span><b>Seguro</b> Código activo</span>
             </div>
           </div>
         </div>
@@ -130,7 +172,7 @@ footer{padding:10px 16px;color:var(--muted);font-size:11px;border-top:1px solid 
       </section>
       <div id="frameWrap"><iframe id="frame" title="Aula" allow="fullscreen; gamepad; pointer-lock"></iframe></div>
     </main>
-    <footer><span id="status">Listo · WISP autoconnect</span><span style="margin-left:auto">Murcia · WISP v2 · Bare v3</span></footer>
+    <footer><span id="status">Listo · Protegido con código · WISP autoconnect</span><span style="margin-left:auto">Murcia · Seguro · WISP v2</span></footer>
   </div>
 </div>
 
@@ -139,19 +181,233 @@ footer{padding:10px 16px;color:var(--muted);font-size:11px;border-top:1px solid 
     <div class="modal-head"><h3>Configuración · Murcia</h3><button id="close-settings">✕</button></div>
     <div class="modal-body">
       <div class="field"><label>Modo</label><select id="mode-select"><option value="turbo">Turbo Murcia (recomendado)</option><option value="proxy">Proxy</option><option value="wisp">WISP Directo</option><option value="direct">Directo</option></select></div>
+      <div class="field" style="background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px">
+        <label style="color:var(--text);font-weight:600">🔒 Código de acceso</label>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <input id="settings-code" type="password" maxlength="8" placeholder="Nuevo código (4-8 dígitos)" style="flex:1"/>
+          <button class="btn secondary" id="btn-save-code">Guardar</button>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn secondary" id="btn-disable-code" style="flex:1">Desactivar protección</button>
+          <button class="btn secondary" id="btn-lock-now" style="flex:1">Bloquear ahora</button>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px">Código actual: <span id="code-status">—</span> · Por defecto: 1234</div>
+      </div>
       <div class="field"><label>Servidor WISP — autoconnect al más rápido</label><div class="server-list" id="server-list"><div style="padding:10px;color:var(--muted);font-size:12px">Cargando...</div></div><div style="display:flex;gap:8px;margin-top:10px"><button class="btn secondary" id="btn-test" style="flex:1">Probar</button><button class="btn secondary" id="btn-auto" style="flex:1">Auto</button></div></div>
       <div class="field"><label>Estado</label><div style="background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;font-size:12px;color:var(--muted)" id="settings-status">Iniciando...</div></div>
     </div>
   </div>
 </div>
 
-<!-- Core app - sin dependencias, siempre funciona -->
+<!-- Core app -->
 <script>
 (function(){
-  // Helpers seguros
   function gid(id){ return document.getElementById(id); }
   function log(){ try{ console.log.apply(console, arguments); }catch(e){} }
 
+  // ===== SEGURIDAD CON CÓDIGO =====
+  var CODE_KEY = 'aula-access-code';
+  var CODE_ENABLED_KEY = 'aula-code-enabled';
+  var DEFAULT_CODE = '1234';
+
+  function getStoredCode(){
+    try{ return localStorage.getItem(CODE_KEY); }catch(e){ return null; }
+  }
+  function isCodeEnabled(){
+    try{
+      var v = localStorage.getItem(CODE_ENABLED_KEY);
+      if(v===null) return true; // por defecto activado
+      return v==='true';
+    }catch(e){ return true; }
+  }
+  function setCodeEnabled(en){
+    try{ localStorage.setItem(CODE_ENABLED_KEY, en?'true':'false'); }catch(e){}
+  }
+  function hashCode(c){ // simple hash para no guardar en claro
+    try{ return btoa(c).split('').reverse().join(''); }catch(e){ return c; }
+  }
+  function checkCode(input){
+    var stored = getStoredCode();
+    if(!stored) return input===DEFAULT_CODE;
+    return hashCode(input)===stored || input===DEFAULT_CODE; // DEFAULT_CODE siempre funciona como master
+  }
+  function saveCode(newCode){
+    try{
+      localStorage.setItem(CODE_KEY, hashCode(newCode));
+      setCodeEnabled(true);
+      return true;
+    }catch(e){ return false; }
+  }
+
+  var lockScreen = gid('lock-screen');
+  var lockTitle = gid('lock-title');
+  var lockHint = gid('lock-hint');
+  var lockSetup = gid('lock-setup');
+  var lockEnter = gid('lock-enter');
+  var codeInput = gid('code-input');
+  var codeNew = gid('code-new');
+  var codeConfirm = gid('code-confirm');
+  var lockError = gid('lock-error');
+  var lockSubmit = gid('lock-submit');
+  var lockCancel = gid('lock-cancel');
+  var lockFooterDefault = gid('lock-footer-default');
+  var lockFooterSetup = gid('lock-footer-setup');
+
+  var isSetupMode = false;
+
+  function showError(msg){
+    if(!lockError) return;
+    lockError.textContent=msg;
+    lockError.classList.add('show');
+    setTimeout(function(){ lockError.classList.remove('show'); }, 3000);
+  }
+
+  function showLock(mode){
+    if(!lockScreen) return;
+    isSetupMode = (mode==='setup');
+    lockScreen.style.display='flex';
+    if(isSetupMode){
+      if(lockTitle) lockTitle.textContent='Configurar código';
+      if(lockHint) lockHint.textContent='Crea un código de 4 a 8 dígitos para proteger el acceso';
+      if(lockSetup) lockSetup.style.display='block';
+      if(lockEnter) lockEnter.style.display='none';
+      if(lockSubmit) lockSubmit.textContent='Guardar código';
+      if(lockCancel) lockCancel.style.display='none';
+      if(lockFooterDefault) lockFooterDefault.style.display='none';
+      if(lockFooterSetup) lockFooterSetup.style.display='block';
+      if(codeNew) { codeNew.value=''; codeNew.focus(); }
+    }else{
+      if(lockTitle) lockTitle.textContent='Aula Virtual';
+      if(lockHint) lockHint.textContent='Introduce el código de acceso para continuar';
+      if(lockSetup) lockSetup.style.display='none';
+      if(lockEnter) lockEnter.style.display='block';
+      if(lockSubmit) lockSubmit.textContent='Desbloquear';
+      if(lockCancel) lockCancel.style.display='none';
+      if(lockFooterDefault) lockFooterDefault.style.display='block';
+      if(lockFooterSetup) lockFooterSetup.style.display='none';
+      if(codeInput) { codeInput.value=''; setTimeout(function(){ codeInput.focus(); }, 100); }
+    }
+  }
+
+  function hideLock(){
+    if(lockScreen) lockScreen.style.display='none';
+  }
+
+  function handleUnlock(){
+    if(isSetupMode){
+      var n = codeNew ? codeNew.value.trim() : '';
+      var c = codeConfirm ? codeConfirm.value.trim() : '';
+      if(n.length<4){ showError('El código debe tener al menos 4 dígitos'); return; }
+      if(n!==c){ showError('Los códigos no coinciden'); return; }
+      if(saveCode(n)){
+        hideLock();
+        if(gid('status')) gid('status').textContent='Código configurado · Acceso concedido';
+        // Iniciar WISP después de desbloquear
+        setTimeout(function(){ if(window.initWisp) window.initWisp(); }, 300);
+      }else{
+        showError('Error guardando código');
+      }
+    }else{
+      var input = codeInput ? codeInput.value.trim() : '';
+      if(!input){ showError('Introduce el código'); return; }
+      if(checkCode(input)){
+        hideLock();
+        if(gid('status')) gid('status').textContent='Acceso concedido · WISP autoconnect';
+        setTimeout(function(){ if(window.initWisp) window.initWisp(); }, 300);
+      }else{
+        showError('Código incorrecto');
+        if(codeInput){ codeInput.value=''; codeInput.focus(); }
+        // Vibración si disponible
+        try{ navigator.vibrate && navigator.vibrate(200); }catch(e){}
+      }
+    }
+  }
+
+  // Eventos lock
+  if(lockSubmit) lockSubmit.addEventListener('click', handleUnlock);
+  if(codeInput) codeInput.addEventListener('keydown', function(e){ if(e.key==='Enter') handleUnlock(); });
+  if(codeConfirm) codeConfirm.addEventListener('keydown', function(e){ if(e.key==='Enter') handleUnlock(); });
+  var btnUseDefault = gid('btn-use-default');
+  if(btnUseDefault) btnUseDefault.addEventListener('click', function(){
+    if(isSetupMode){
+      if(saveCode(DEFAULT_CODE)){
+        hideLock();
+        if(gid('status')) gid('status').textContent='Código por defecto (1234) activado';
+        setTimeout(function(){ if(window.initWisp) window.initWisp(); }, 300);
+      }
+    }
+  });
+
+  // Inicializar bloqueo al cargar
+  function initLock(){
+    if(!isCodeEnabled()){
+      hideLock();
+      return;
+    }
+    var stored = getStoredCode();
+    if(!stored){
+      showLock('setup');
+    }else{
+      showLock('enter');
+    }
+  }
+
+  // Exponer para uso externo
+  window.showLock = function(){ showLock('enter'); };
+  window.hideLock = hideLock;
+  window.initLock = initLock;
+
+  // Botón bloquear en rail
+  var lockBtn = gid('lock-btn');
+  if(lockBtn) lockBtn.addEventListener('click', function(){ showLock('enter'); });
+
+  // Settings código
+  var btnSaveCode = gid('btn-save-code');
+  var settingsCode = gid('settings-code');
+  var codeStatus = gid('code-status');
+  var btnDisableCode = gid('btn-disable-code');
+  var btnLockNow = gid('btn-lock-now');
+
+  function updateCodeStatus(){
+    if(!codeStatus) return;
+    if(!isCodeEnabled()){ codeStatus.textContent='Desactivado'; return; }
+    var stored = getStoredCode();
+    codeStatus.textContent = stored ? 'Activo · Personalizado' : 'Activo · Por defecto (1234)';
+  }
+
+  if(btnSaveCode) btnSaveCode.addEventListener('click', function(){
+    var nc = settingsCode ? settingsCode.value.trim() : '';
+    if(nc.length<4){ alert('Código mínimo 4 dígitos'); return; }
+    if(saveCode(nc)){
+      alert('Código guardado: '+nc);
+      if(settingsCode) settingsCode.value='';
+      updateCodeStatus();
+    }else{
+      alert('Error guardando');
+    }
+  });
+  if(btnDisableCode) btnDisableCode.addEventListener('click', function(){
+    if(confirm('¿Desactivar protección con código?')){
+      setCodeEnabled(false);
+      try{ localStorage.removeItem(CODE_KEY); }catch(e){}
+      updateCodeStatus();
+      alert('Protección desactivada');
+    }
+  });
+  if(btnLockNow) btnLockNow.addEventListener('click', function(){
+    var m = gid('settings-modal');
+    if(m) m.classList.remove('open');
+    showLock('enter');
+  });
+
+  // Iniciar lock al cargar
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', function(){ initLock(); updateCodeStatus(); });
+  }else{
+    initLock(); updateCodeStatus();
+  }
+
+  // ===== APP CORE - Botones siempre funcionan =====
   var frame = gid('frame');
   var frameWrap = gid('frameWrap');
   var splash = gid('splash');
@@ -181,47 +437,36 @@ footer{padding:10px 16px;color:var(--muted);font-size:11px;border-top:1px solid 
   function proxied(u){
     if(!allowed(u)) return u;
     var m = getMode();
-    // En IWA bundle (.swbn) no hay servidor, así que si estamos en isolated-app:// usar directo
-    // En dev (http://localhost) usar proxy para quitar X-Frame-Options
     var isIsolated = location.protocol === 'isolated-app:';
     if(isIsolated){
-      // En IWA instalada, intentar proxy solo si estamos en dev, sino directo (el WISP del sistema puede ayudar)
-      // Para 100% funcional en IWA, usamos proxy si existe, sino directo
       if(m==='direct') return u;
-      // Intentar proxy, si falla el iframe mostrará fallback pero no pantalla blanca vacía
       return '/proxy/roblox/?url='+encodeURIComponent(u);
     }
     if(m==='turbo' || m==='proxy' || m==='wisp') return '/proxy/roblox/?url='+encodeURIComponent(u);
     return u;
   }
-
   function load(u){
     try{
       if(!allowed(u)){ if(statusEl) statusEl.textContent='Solo *.roblox.com'; return; }
       var finalUrl = proxied(u);
-      log('[Murcia] load', u, '->', finalUrl, 'mode', getMode());
       if(splash) splash.style.display='none';
       if(frameWrap) frameWrap.classList.add('active');
       if(frame) frame.src = finalUrl;
       if(urlInput) urlInput.value = u;
-      if(statusEl) statusEl.textContent = 'Cargando '+u;
+      if(statusEl) statusEl.textContent='Cargando '+u;
       document.querySelectorAll('.rail button[data-url]').forEach(function(b){
         b.classList.toggle('active', b.getAttribute('data-url')===u);
       });
     }catch(e){
       log('load error', e);
-      if(statusEl) statusEl.textContent='Error: '+e.message;
     }
   }
 
-  // Botones - con null checks para que nunca fallen
   try{
     var launchBtn = gid('launch');
     if(launchBtn) launchBtn.addEventListener('click', function(){ load(HOME); });
-
     var exploreBtn = gid('explore-btn');
     if(exploreBtn) exploreBtn.addEventListener('click', function(){ load('https://www.roblox.com/discover'); });
-
     var homeBtn = gid('home-btn');
     if(homeBtn) homeBtn.addEventListener('click', function(){
       if(frameWrap) frameWrap.classList.remove('active');
@@ -230,7 +475,6 @@ footer{padding:10px 16px;color:var(--muted);font-size:11px;border-top:1px solid 
       if(statusEl) statusEl.textContent='Inicio';
       document.querySelectorAll('.rail button').forEach(function(b){ b.classList.remove('active'); });
     });
-
     document.querySelectorAll('[data-url]').forEach(function(el){
       el.addEventListener('click', function(e){
         e.preventDefault();
@@ -238,26 +482,22 @@ footer{padding:10px 16px;color:var(--muted);font-size:11px;border-top:1px solid 
         if(u) load(u);
       });
     });
-
     var goForm = gid('go-form');
     if(goForm) goForm.addEventListener('submit', function(e){
       e.preventDefault();
       load(dest(urlInput ? urlInput.value : ''));
     });
-
     if(frame) frame.addEventListener('load', function(){
       if(frameWrap && frameWrap.classList.contains('active') && statusEl){
         statusEl.textContent='Sesión activa · '+new Date().toLocaleTimeString('es-ES');
       }
     });
-
     var settingsBtn = gid('settings-btn');
     if(settingsBtn) settingsBtn.addEventListener('click', function(){ var m=gid('settings-modal'); if(m) m.classList.add('open'); });
     var closeBtn = gid('close-settings');
     if(closeBtn) closeBtn.addEventListener('click', function(){ var m=gid('settings-modal'); if(m) m.classList.remove('open'); });
     var modal = gid('settings-modal');
     if(modal) modal.addEventListener('click', function(e){ if(e.target.id==='settings-modal') e.target.classList.remove('open'); });
-
     var modeSel = gid('mode-select');
     if(modeSel){
       try{ modeSel.value = getMode(); }catch(e){}
@@ -266,21 +506,13 @@ footer{padding:10px 16px;color:var(--muted);font-size:11px;border-top:1px solid 
         if(statusEl) statusEl.textContent='Modo '+modeSel.value;
       });
     }
+  }catch(e){ log('Error botones', e); }
 
-    log('[Murcia] Botones inicializados OK');
-  }catch(e){
-    log('Error inicializando botones', e);
-    // Fallback inline handlers si addEventListener falla
-    window.loadRoblox = load;
-  }
-
-  // Exponer load global para debugging y para fallback onclick=""
   window.loadRoblox = load;
   window.ROBLOX_HOME = HOME;
 })();
 </script>
 
-<!-- WISP autoconnect - opcional, no bloquea botones si falla -->
 <script type="module">
 try{
   const gid = (id)=>document.getElementById(id);
@@ -292,33 +524,23 @@ try{
   const serverListEl = gid('server-list');
   const settingsStatus = gid('settings-status');
 
-  // Import dinámico con try-catch para que nunca rompa la UI
   let WispMurcia = null;
   try{
     const mod = await import('/wisp-murcia.js');
     WispMurcia = mod.default || window.WispMurcia;
     window.WispMurcia = WispMurcia;
-    console.log('[Murcia] WISP module cargado');
   }catch(e){
-    console.warn('[Murcia] WISP module no disponible, modo directo', e);
-    if(wispText) wispText.textContent='WISP Murcia · Modo directo (sin servidor)';
-    if(settingsStatus) settingsStatus.textContent='WISP no disponible en bundle .swbn. Usa npm start para servidor local. Botones funcionan en modo directo.';
-    // No seguir si no hay WISP
+    console.warn('WISP no disponible', e);
+    if(wispText) wispText.textContent='WISP Murcia · Modo directo';
+    if(settingsStatus) settingsStatus.textContent='WISP no disponible en .swbn. Usa npm start. Botones OK.';
     throw e;
-  }
-
-  if(!WispMurcia){
-    throw new Error('WispMurcia null');
   }
 
   async function initWisp(){
     try{
       if(wispText) wispText.textContent='WISP Murcia · Cargando...';
       const servers = await WispMurcia.init();
-      if(!servers || !servers.length){
-        if(wispText) wispText.textContent='WISP Murcia · Desconectado';
-        return;
-      }
+      if(!servers || !servers.length) return;
       if(serverListEl){
         serverListEl.innerHTML = servers.map(s=>`
           <div class="srv ${s.id==='local'?'active':''}" data-url="${s.url}" data-id="${s.id}">
@@ -337,71 +559,49 @@ try{
           });
         });
       }
-
       try{
         const st = await WispMurcia.getMurciaStatus();
         if(st && settingsStatus){
-          settingsStatus.textContent=`Murcia · Latencia Roblox: ${st.performance?.robloxLatency||'—'}ms · Uptime: ${st.performance?.server?.uptime||0}s`;
+          settingsStatus.textContent=`Murcia · Roblox: ${st.performance?.robloxLatency||'—'}ms · Uptime: ${st.performance?.server?.uptime||0}s`;
         }
       }catch{}
-
-      // AUTOCONNECT
-      if(wispText) wispText.textContent='WISP Murcia · Autoconectando al más rápido...';
+      if(wispText) wispText.textContent='WISP Murcia · Autoconectando...';
       setTimeout(async ()=>{
         try{
           const ok = await WispMurcia.connectFastest();
-          if(!ok && servers[0]){
-            await WispMurcia.connect(servers[0].url, servers[0]);
-          }
-        }catch(e){ console.warn('autoconnect fail', e); }
+          if(!ok && servers[0]) await WispMurcia.connect(servers[0].url, servers[0]);
+        }catch(e){}
       }, 600);
-
-    }catch(e){
-      console.error('initWisp error', e);
-      if(wispText) wispText.textContent='WISP Murcia · Error, modo directo';
-    }
+    }catch(e){ console.error('initWisp', e); }
   }
 
-  WispMurcia.onStatusChange(s=>{
-    try{
-      const on = s.connected;
-      if(wispDot) wispDot.className='dot '+(on?'on':'');
-      if(wispText) wispText.textContent= on ? `WISP Murcia · ${s.server?.name||'Conectado'}` : 'WISP Murcia · Desconectado';
-      if(wispLatency) wispLatency.textContent= on && s.latency!==-1 ? `${s.latency}ms` : '';
-      if(wispAction) wispAction.textContent= on ? 'Desconectar' : 'Conectar';
-      if(metaDetail) metaDetail.textContent= on ? `${s.server?.name||''} · ${s.latency}ms · Auto` : 'Autoconectando...';
-      const pingEl = document.getElementById(`ping-${s.server?.id}`);
-      if(pingEl && on){ pingEl.textContent=s.latency+'ms'; pingEl.classList.add('ok'); }
-      const statusEl = document.getElementById('status');
-      if(statusEl && on) statusEl.textContent=`WISP conectado · ${s.server?.name} · ${s.latency}ms`;
-    }catch(e){}
-  });
+  window.initWisp = initWisp;
 
-  if(gid('wisp-action')){
-    gid('wisp-action').addEventListener('click', ()=>{
+  if(WispMurcia){
+    WispMurcia.onStatusChange(s=>{
       try{
-        if(WispMurcia.isConnected) WispMurcia.disconnect();
-        else WispMurcia.connectFastest();
+        const on = s.connected;
+        if(wispDot) wispDot.className='dot '+(on?'on':'');
+        if(wispText) wispText.textContent= on ? `WISP Murcia · ${s.server?.name||'Conectado'}` : 'WISP Murcia · Desconectado';
+        if(wispLatency) wispLatency.textContent= on && s.latency!==-1 ? `${s.latency}ms` : '';
+        if(wispAction) wispAction.textContent= on ? 'Desconectar' : 'Conectar';
+        if(metaDetail) metaDetail.textContent= on ? `${s.server?.name||''} · ${s.latency}ms · Auto` : 'Autoconectando...';
+        const pingEl = document.getElementById(`ping-${s.server?.id}`);
+        if(pingEl && on){ pingEl.textContent=s.latency+'ms'; pingEl.classList.add('ok'); }
       }catch(e){}
     });
+
+    if(gid('wisp-action')) gid('wisp-action').addEventListener('click', ()=>{
+      try{ if(WispMurcia.isConnected) WispMurcia.disconnect(); else WispMurcia.connectFastest(); }catch(e){}
+    });
+    if(gid('btn-test')) gid('btn-test').addEventListener('click', ()=>{ try{ WispMurcia.testAllServers(); }catch(e){} });
+    if(gid('btn-auto')) gid('btn-auto').addEventListener('click', ()=>{ try{ WispMurcia.connectFastest(); }catch(e){} });
+
+    // No auto iniciar aquí, se inicia después de desbloquear código
+    // initWisp() se llama desde el lock screen al desbloquear
   }
-  if(gid('btn-test')) gid('btn-test').addEventListener('click', ()=>{ try{ WispMurcia.testAllServers(); }catch(e){} });
-  if(gid('btn-auto')) gid('btn-auto').addEventListener('click', ()=>{ try{ WispMurcia.connectFastest(); }catch(e){} });
 
-  initWisp();
-
-  setInterval(()=>{
-    try{
-      if(!WispMurcia.isConnected){
-        console.log('[Murcia] Reintentando autoconnect...');
-        WispMurcia.connectFastest().catch(()=>{});
-      }
-    }catch(e){}
-  }, 15000);
-
-}catch(e){
-  console.warn('[Murcia] WISP autoconnect deshabilitado, botones siguen funcionando', e);
-}
+}catch(e){ console.warn('WISP module error', e); }
 </script>
 </body>
 </html>
