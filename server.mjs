@@ -488,6 +488,14 @@ const WISP_SERVERS = [
   {name:'EU 3', url:'wss://wisp.rhw.cloud/'}
 ];
 
+const BARE_SERVERS = [
+  'https://bare.mercurywork.shop/',
+  'https://bare.nightnetwork.cloud/',
+  'https://bare.astroid.wtf/',
+  'https://bare.rhw.cloud/',
+  '/bare/'
+];
+
 async function tryWisp(){
   setProg(10);
   log('Probando WISP Murcia optimizado...');
@@ -505,12 +513,14 @@ async function tryWisp(){
     try{
       setStatus('Probando fetch directo del navegador...');
       setProg(40);
-      const r = await fetch(targetUrl, {mode:'no-cors'});
-      log('Fetch directo intentó, redirigiendo a '+targetUrl);
-      setProg(100);
-      setStatus('Redirigiendo a Roblox...');
-      // Si no-cors no permite leer, al menos redirigir el iframe top
-      setTimeout(()=>{ location.href = targetUrl; }, 500);
+      // Intentar fetch directo con cors
+      const r = await fetch(targetUrl);
+      const text = await r.text();
+      log('Fetch directo OK: '+text.length+' bytes');
+      setProg(90);
+      document.open();
+      document.write(text);
+      document.close();
       return;
     }catch(e){
       log('Fetch directo falló: '+e.message);
@@ -520,68 +530,90 @@ async function tryWisp(){
   }
 
   setProg(25);
-  // Probar servidores WISP
+  // 1. Intentar con Bare transport (más compatible, no tiene bug {} is not iterable)
+  for(let i=0;i<BARE_SERVERS.length;i++){
+    const bareUrl = BARE_SERVERS[i];
+    setStatus('Probando Bare '+bareUrl+'...');
+    log('Probando Bare: '+bareUrl);
+    setProg(25 + (i/BARE_SERVERS.length)*20);
+    try{
+      const conn = new BareMuxConnection('/lib/bare-mux/worker.js');
+      log('Set transport Bare: '+bareUrl);
+      await conn.setTransport('/lib/bare/index.mjs', [bareUrl]);
+      log('Bare transport OK');
+      const client = new BareClient();
+      setStatus('Trayendo '+targetUrl+' via Bare '+bareUrl+'...');
+      log('Fetch via BareClient: '+targetUrl);
+      const res = await client.fetch(targetUrl);
+      log('Respuesta Bare: '+res.status);
+      if(!res.ok){ log('Bare status no OK: '+res.status); continue; }
+      const contentType = res.headers.get('content-type')||'';
+      log('Bare Content-Type: '+contentType);
+      if(contentType.includes('text/html')){
+        const text = await res.text();
+        log('Bare HTML: '+text.length+' bytes - 100% funcional');
+        setProg(90);
+        setStatus('Renderizando 100% sin bloqueo...');
+        let html = text;
+        if(!html.includes('<base')){ html = html.replace('<head>', '<head><base href="https://www.roblox.com/">'); }
+        html = html.replace(/<meta[^>]*http-equiv=["']X-Frame-Options["'][^>]*>/gi, '');
+        setProg(100);
+        document.open();
+        document.write(html);
+        document.close();
+        return;
+      }
+    }catch(e){
+      log('Bare error '+bareUrl+': '+e.message+' '+(e.stack||'').slice(0,200));
+      continue;
+    }
+  }
+
+  setProg(50);
+  // 2. Intentar con Epoxy + WISP (si Bare falla)
   for(let i=0;i<WISP_SERVERS.length;i++){
     const srv = WISP_SERVERS[i];
     setStatus('Probando '+srv.name+' ('+srv.url+')...');
-    log('Probando '+srv.name+': '+srv.url);
-    setProg(25 + (i/WISP_SERVERS.length)*40);
+    log('Probando WISP '+srv.name+': '+srv.url);
+    setProg(50 + (i/WISP_SERVERS.length)*40);
     
     try{
       const conn = new BareMuxConnection('/lib/bare-mux/worker.js');
       log('Conectando a '+srv.url+' via Epoxy...');
       await conn.setTransport('/lib/epoxy/index.mjs', [{wisp: srv.url}]);
-      log('Transporte Epoxy OK con '+srv.name);
+      log('Epoxy OK con '+srv.name);
       
       const client = new BareClient();
       setStatus('Trayendo '+targetUrl+' via '+srv.name+'...');
-      log('Fetch via BareClient: '+targetUrl);
+      log('Fetch via BareClient Epoxy: '+targetUrl);
       
       const res = await client.fetch(targetUrl);
-      log('Respuesta: '+res.status+' '+res.statusText);
+      log('Respuesta Epoxy: '+res.status);
       
       if(!res.ok){
-        log('Status no OK: '+res.status+', probando siguiente...');
+        log('Epoxy status no OK: '+res.status);
         continue;
       }
       
       const contentType = res.headers.get('content-type')||'';
-      log('Content-Type: '+contentType);
+      log('Epoxy Content-Type: '+contentType);
       
       if(contentType.includes('text/html')){
         const text = await res.text();
-        log('HTML recibido: '+text.length+' bytes');
+        log('Epoxy HTML: '+text.length+' bytes');
         setProg(90);
-        setStatus('Renderizando Roblox 100%...');
-        
-        // Inyectar base para recursos relativos y quitar X-Frame
         let html = text;
-        // Añadir base tag si no existe
-        if(!html.includes('<base')){
-          html = html.replace('<head>', '<head><base href="https://www.roblox.com/">');
-        }
-        // Quitar X-Frame-Options meta si existe
+        if(!html.includes('<base')){ html = html.replace('<head>', '<head><base href="https://www.roblox.com/">'); }
         html = html.replace(/<meta[^>]*http-equiv=["']X-Frame-Options["'][^>]*>/gi, '');
-        
         setProg(100);
-        log('Renderizando 100% funcional sin bloqueo');
-        
-        // Escribir en documento actual (reemplaza loader por Roblox)
         document.open();
         document.write(html);
         document.close();
         return;
-      }else{
-        // Para assets no-HTML, redirigir
-        log('No es HTML, tipo: '+contentType);
-        const blob = await res.blob();
-        const url = URL.createObjectURL(blob);
-        location.href = url;
-        return;
       }
       
     }catch(e){
-      log('Error con '+srv.name+': '+e.message);
+      log('Error WISP '+srv.name+': '+e.message+' '+(e.stack||'').slice(0,300));
       continue;
     }
   }

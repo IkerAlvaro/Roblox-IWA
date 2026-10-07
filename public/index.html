@@ -259,11 +259,12 @@ body{font-family:Inter,system-ui,-apple-system,sans-serif;background:var(--bg);c
   try{modeSel.value=localStorage.getItem('roblox-mode')||'turbo';}catch(e){}
   modeSel.onchange=function(){try{localStorage.setItem('roblox-mode',modeSel.value);}catch(e){} statusEl.textContent='Modo '+modeSel.value+' · Proxy '+(modeSel.value==='direct'?'desactivado':'100%');};
 
-  // WISP autoconnect simple y robusto
+  // WISP + Bare autoconnect 100% - prueba Bare primero (más compatible, evita {} is not iterable)
   async function initWisp(){
     try{
       wispTxt.textContent='WISP Murcia · Cargando servidores...';
       var servers=[];
+      var bareServers=['https://bare.mercurywork.shop/','https://bare.nightnetwork.cloud/','https://bare.astroid.wtf/','/bare/'];
       try{
         var r=await fetch('/api/wisp-servers');
         if(r.ok){var j=await r.json(); servers=j.servers||[];}
@@ -302,35 +303,71 @@ body{font-family:Inter,system-ui,-apple-system,sans-serif;background:var(--bg);c
         if(proxyStatus){proxyStatus.textContent='● Proxy fallback'; proxyStatus.style.color='var(--warn)';}
       }
 
-      // Autoconnect
+      // Autoconnect - Bare primero (evita {} is not iterable) luego WISP
       wispTxt.textContent='WISP Murcia · Autoconectando al más rápido...';
       var best=null, bestMs=9999;
-      async function ping(url){
-        return new Promise(function(res){
-          var start=performance.now();
+      var bareOk=false;
+      // Intentar Bare-Mux + Bare transport (más compatible)
+      try{
+        var bareMod=await import('/lib/bare-mux/index.mjs');
+        var BareMuxConnection=bareMod.BareMuxConnection;
+        var BareClient=bareMod.BareClient;
+        for(var b=0;b<bareServers.length;b++){
+          var bareUrl=bareServers[b];
           try{
-            var ws=new WebSocket(url);
-            var t=setTimeout(function(){try{ws.close();}catch(e){} res(-1);},2500);
-            ws.onopen=function(){clearTimeout(t); var ms=Math.round(performance.now()-start); try{ws.close();}catch(e){} res(ms);};
-            ws.onerror=function(){clearTimeout(t); res(-1);};
-          }catch(e){res(-1);}
-        });
-      }
-      for(var i=0;i<servers.length;i++){
-        var ms=await ping(servers[i].url);
-        if(ms!==-1 && ms<bestMs){bestMs=ms; best=servers[i];}
-        if(best && bestMs<30) break;
-      }
-      if(best){
-        dot.classList.add('on');
-        wispTxt.textContent='WISP Murcia · '+best.name;
-        wispMs.textContent=bestMs+'ms · Auto';
-        var sd=document.getElementById('statWispDetail');
-        if(sd) sd.textContent=best.name+' · '+bestMs+'ms';
-        statusEl.textContent='WISP conectado · '+best.name+' · '+bestMs+'ms · Proxy 100%';
-      }else{
-        wispTxt.textContent='WISP Murcia · Modo directo';
-        wispMs.textContent='Directo · Proxy 100%';
+            wispTxt.textContent='Probando Bare '+bareUrl+'...';
+            var conn=new BareMuxConnection('/lib/bare-mux/worker.js');
+            await conn.setTransport('/lib/bare/index.mjs',[bareUrl]);
+            var client=new BareClient();
+            var start=performance.now();
+            var res=await client.fetch('https://www.roblox.com/favicon.ico');
+            if(res.ok){
+              var ms=Math.round(performance.now()-start);
+              bareOk=true;
+              best={name:'Bare '+bareUrl.replace('https://','').replace('/',''), url:bareUrl};
+              bestMs=ms;
+              dot.classList.add('on');
+              wispTxt.textContent='WISP Murcia · '+best.name;
+              wispMs.textContent=ms+'ms · Bare 100%';
+              var sd=document.getElementById('statWispDetail');
+              if(sd) sd.textContent=best.name+' · '+ms+'ms · Bare OK';
+              statusEl.textContent='Bare conectado · '+best.name+' · '+ms+'ms · Proxy 100%';
+              console.log('[Aula] Bare OK',bareUrl,ms+'ms');
+              break;
+            }
+          }catch(be){console.log('[Aula] Bare fail',bareUrl,be.message);}
+        }
+      }catch(e){console.log('[Aula] Bare-Mux no disponible',e.message);}
+
+      // Si Bare no funcionó, probar WISP ping
+      if(!bareOk){
+        async function ping(url){
+          return new Promise(function(res){
+            var start=performance.now();
+            try{
+              var ws=new WebSocket(url);
+              var t=setTimeout(function(){try{ws.close();}catch(e){} res(-1);},2500);
+              ws.onopen=function(){clearTimeout(t); var ms=Math.round(performance.now()-start); try{ws.close();}catch(e){} res(ms);};
+              ws.onerror=function(){clearTimeout(t); res(-1);};
+            }catch(e){res(-1);}
+          });
+        }
+        for(var i=0;i<servers.length;i++){
+          var ms=await ping(servers[i].url);
+          if(ms!==-1 && ms<bestMs){bestMs=ms; best=servers[i];}
+          if(best && bestMs<30) break;
+        }
+        if(best){
+          dot.classList.add('on');
+          wispTxt.textContent='WISP Murcia · '+best.name;
+          wispMs.textContent=bestMs+'ms · Auto';
+          var sd=document.getElementById('statWispDetail');
+          if(sd) sd.textContent=best.name+' · '+bestMs+'ms';
+          statusEl.textContent='WISP conectado · '+best.name+' · '+bestMs+'ms · Proxy 100%';
+        }else{
+          wispTxt.textContent='WISP Murcia · Modo directo';
+          wispMs.textContent='Directo · Proxy 100%';
+        }
       }
     }catch(e){console.warn('WISP fail',e); wispTxt.textContent='WISP Murcia · Modo directo · Proxy 100%';}
   }
