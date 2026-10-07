@@ -41,7 +41,7 @@
       .btn.secondary:hover{background:#242738;color:var(--text)}
       #clock{color:var(--muted);font-size:12px;min-width:48px;text-align:right;font-variant-numeric:tabular-nums}
       .status-line{display:flex;align-items:center;gap:8px;padding:8px 16px;background:var(--panel);border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}
-      .status-line .dot{width:7px;height:7px;border-radius:50%;background:var(--muted)}
+      .status-line .dot{width:7px;height:7px;border-radius:50%;background:var(--muted);flex-shrink:0}
       .status-line .dot.on{background:var(--green);box-shadow:0 0 6px rgba(46,204,113,.4)}
       .status-line .dot.warn{background:#f1c40f}
       .status-line .right{margin-left:auto;display:flex;gap:12px;align-items:center}
@@ -52,19 +52,18 @@
       .hero{display:flex;gap:24px;align-items:flex-start;padding:28px;border-radius:16px;background:var(--panel);border:1px solid var(--line)}
       .hero img{width:80px;height:80px;border-radius:16px;flex:0 0 80px}
       .hero h1{margin:0 0 8px;font-size:26px;font-weight:700;letter-spacing:-.02em;line-height:1.2}
-      .hero .sub{color:var(--muted);font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
+      .hero .sub{color:var(--muted);font-size:12px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
       .hero p{color:var(--text2);line-height:1.6;margin:0;font-size:14px;max-width:56ch}
-      .hero .cta{display:flex;gap:8px;margin-top:18px}
-      .meta{margin-top:14px;display:flex;gap:16px;color:var(--muted);font-size:12px}
+      .hero .cta{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
+      .meta{margin-top:14px;display:flex;gap:16px;color:var(--muted);font-size:12px;flex-wrap:wrap}
       .meta b{color:var(--text2);font-weight:600}
       .section{margin:28px 0 12px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
       .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
-      .card{text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;cursor:pointer;transition:.15s}
+      .card{text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;cursor:pointer;transition:.15s;color:var(--text)}
       .card:hover{border-color:#2f3347;background:var(--panel2)}
       .card .k{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
       .card strong{display:block;font-size:15px;font-weight:600;margin-bottom:4px}
       .card em{font-style:normal;color:var(--muted);font-size:12px;line-height:1.4}
-      /* settings modal */
       .modal{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
       .modal.open{display:flex}
       .modal-box{width:100%;max-width:560px;background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden}
@@ -116,7 +115,7 @@
         </header>
         <div class="status-line" id="status-line">
           <div class="dot" id="wisp-dot"></div>
-          <span id="wisp-text">WISP Murcia · Iniciando</span>
+          <span id="wisp-text">WISP Murcia · Iniciando autoconnect...</span>
           <span id="wisp-latency" style="color:var(--text2)"></span>
           <div class="right">
             <span id="region-label">Murcia, España</span>
@@ -133,10 +132,10 @@
                 <p>Cliente instalable para ChromeOS con servidor WISP integrado. Conexión optimizada para baja latencia en Murcia, España. Proxy integrado para compatibilidad completa con iframe.</p>
                 <div class="cta">
                   <button class="btn" id="launch">Abrir Roblox</button>
-                  <button class="btn secondary" data-url="https://www.roblox.com/discover">Explorar</button>
+                  <button class="btn secondary" id="explore-btn">Explorar</button>
                 </div>
                 <div class="meta">
-                  <span><b id="meta-wisp">WISP</b> <span id="meta-wisp-detail">Desconectado</span></span>
+                  <span><b>WISP</b> <span id="meta-wisp-detail">Autoconectando...</span></span>
                   <span><b>Región</b> Murcia</span>
                   <span><b>Bare</b> v3 · WISP v2</span>
                 </div>
@@ -155,17 +154,16 @@
 
             <div class="section" style="margin-top:32px">Información</div>
             <div style="background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;color:var(--text2);font-size:13px;line-height:1.6">
-              <p style="margin:0 0 8px;color:var(--text);font-weight:600">Servidor WISP Murcia</p>
-              <p style="margin:0">Servidor local en <code style="background:var(--bg);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:12px">/wisp/</code> con DNS optimizado para España (Cloudflare, Google, Telefónica). Bare Server v3 y proxy <code style="background:var(--bg);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:12px">/proxy/roblox/</code> para compatibilidad completa con iframe sin bloqueos.</p>
+              <p style="margin:0 0 8px;color:var(--text);font-weight:600">Servidor WISP Murcia — Autoconnect activado</p>
+              <p style="margin:0">El WISP se conecta automáticamente al iniciar al servidor más rápido para Murcia. Servidor local en <code style="background:var(--bg);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:12px">/wisp/</code> con DNS optimizado para España. Proxy <code style="background:var(--bg);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:12px">/proxy/roblox/</code> para compatibilidad iframe.</p>
             </div>
           </section>
           <div id="frameWrap"><iframe id="frame" title="Roblox" allow="fullscreen; gamepad; pointer-lock"></iframe></div>
         </main>
-        <footer><span id="status">Listo</span><span style="margin-left:auto" id="footer-info">Murcia, España · WISP v2 · Bare v3</span></footer>
+        <footer><span id="status">Listo · WISP autoconnect activado</span><span style="margin-left:auto">Murcia, España · WISP v2 · Bare v3</span></footer>
       </div>
     </div>
 
-    <!-- Modal Configuración -->
     <div class="modal" id="settings-modal">
       <div class="modal-box">
         <div class="modal-head"><h3>Configuración · Murcia</h3><button id="close-settings">✕</button></div>
@@ -180,8 +178,8 @@
             </select>
           </div>
           <div class="field">
-            <label>Servidor WISP</label>
-            <div class="server-list" id="server-list"></div>
+            <label>Servidor WISP (autoconnect al más rápido)</label>
+            <div class="server-list" id="server-list"><div style="padding:12px;color:var(--muted);font-size:12px">Cargando servidores...</div></div>
             <div style="display:flex;gap:8px;margin-top:10px">
               <button class="btn secondary" id="btn-test" style="flex:1">Probar latencia</button>
               <button class="btn secondary" id="btn-auto" style="flex:1">Auto (más rápido)</button>
@@ -189,7 +187,7 @@
           </div>
           <div class="field">
             <label>Estado</label>
-            <div style="background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;font-size:12px;color:var(--muted);line-height:1.5" id="settings-status">Cargando...</div>
+            <div style="background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;font-size:12px;color:var(--muted);line-height:1.5" id="settings-status">Iniciando WISP Murcia...</div>
           </div>
         </div>
       </div>
@@ -200,85 +198,29 @@
       import WispMurcia from '/wisp-murcia.js';
       window.WispMurcia = WispMurcia;
 
-      const $ = s => document.getElementById(s);
-      const serverListEl = $('server-list');
-      const modeSelect = $('mode-select');
-      const wispDot = $('wisp-dot');
-      const wispText = $('wisp-text');
-      const wispLatency = $('wisp-latency');
-      const wispAction = $('wisp-action');
-      const metaWisp = $('meta-wisp');
-      const metaDetail = $('meta-wisp-detail');
-      const settingsStatus = $('settings-status');
-      const statusLine = $('status-line');
+      // Helpers
+      const gid = (id) => document.getElementById(id);
+      const frame = gid('frame');
+      const frameWrap = gid('frameWrap');
+      const splash = gid('splash');
+      const statusEl = gid('status');
+      const urlInput = gid('url');
+      const wispDot = gid('wisp-dot');
+      const wispText = gid('wisp-text');
+      const wispLatency = gid('wisp-latency');
+      const wispAction = gid('wisp-action');
+      const metaDetail = gid('meta-wisp-detail');
+      const serverListEl = gid('server-list');
+      const settingsStatus = gid('settings-status');
+      const modeSelect = gid('mode-select');
+      const HOME = 'https://www.roblox.com/home';
 
-      async function loadServers(){
-        const servers = await WispMurcia.init();
-        if(!servers) return;
-        serverListEl.innerHTML = servers.map(s=>`
-          <div class="srv ${s.id==='local'?'active':''}" data-url="${s.url}" data-id="${s.id}">
-            <div><div class="name">${s.name}</div><div class="meta2">${s.region} · ${s.country}${s.distanceFromMurcia?` · ${Math.round(s.distanceFromMurcia)}km`:''}</div></div>
-            <div class="ping" id="ping-${s.id}">${s.ping? s.ping+'ms':'—'}</div>
-          </div>
-        `).join('');
-        serverListEl.querySelectorAll('.srv').forEach(el=>{
-          el.addEventListener('click',()=>{
-            const url=el.dataset.url;
-            const id=el.dataset.id;
-            const srv=servers.find(x=>x.id===id);
-            serverListEl.querySelectorAll('.srv').forEach(e=>e.classList.remove('active'));
-            el.classList.add('active');
-            WispMurcia.connect(url,srv);
-          });
-        });
-        const st = await WispMurcia.getMurciaStatus();
-        if(st){
-          settingsStatus.textContent = `Región: Murcia, España · Latencia Roblox: ${st.performance?.robloxLatency||'—'}ms · Uptime: ${st.performance?.server?.uptime||0}s · DNS: ${st.murcia?.isp?.dns?.slice(0,2).join(', ')}`;
-        }
-      }
-
-      WispMurcia.onStatusChange(s=>{
-        const on = s.connected;
-        wispDot.className = 'dot ' + (on ? 'on' : s.latency===-1 ? '' : 'warn');
-        wispText.textContent = on ? `WISP Murcia · ${s.server?.name||'Conectado'}` : 'WISP Murcia · Desconectado';
-        wispLatency.textContent = on && s.latency!==-1 ? `${s.latency}ms` : '';
-        wispAction.textContent = on ? 'Desconectar' : 'Conectar';
-        metaWisp.textContent = on ? 'WISP' : 'WISP';
-        metaDetail.textContent = on ? `${s.server?.name||''} · ${s.latency}ms` : 'Desconectado';
-        const pingEl = document.getElementById(`ping-${s.server?.id}`);
-        if(pingEl && on) { pingEl.textContent = s.latency+'ms'; pingEl.classList.add('ok'); }
-      });
-
-      $('wisp-action').addEventListener('click',()=>{
-        if(WispMurcia.isConnected) WispMurcia.disconnect();
-        else WispMurcia.connectFastest();
-      });
-      $('btn-test').addEventListener('click',()=>WispMurcia.testAllServers());
-      $('btn-auto').addEventListener('click',()=>WispMurcia.connectFastest());
-      $('settings-btn').addEventListener('click',()=>document.getElementById('settings-modal').classList.add('open'));
-      $('close-settings').addEventListener('click',()=>document.getElementById('settings-modal').classList.remove('open'));
-      document.getElementById('settings-modal').addEventListener('click',e=>{ if(e.target.id==='settings-modal') e.target.classList.remove('open'); });
-
-      modeSelect.value = localStorage.getItem('roblox-mode') || 'turbo';
-      modeSelect.addEventListener('change',()=>{
-        localStorage.setItem('roblox-mode', modeSelect.value);
-        document.getElementById('status').textContent = `Modo ${modeSelect.value} activado`;
-        const cur = document.getElementById('url').value;
-        if(cur && document.getElementById('frameWrap').classList.contains('active')){
-          // recarga se maneja en script principal
-        }
-      });
-
-      loadServers();
-    </script>
-
-    <script>
-      const frame=$('frame'), frameWrap=$('frameWrap'), splash=$('splash'), statusEl=$('status'), urlInput=$('url');
-      const HOME='https://www.roblox.com/home';
-      function $(id){return document.getElementById(id)}
-      function clock(){ $('clock').textContent=new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}); }
+      // Clock
+      function clock(){ const el=gid('clock'); if(el) el.textContent=new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}); }
       clock(); setInterval(clock,10000);
-      function allowed(u){ try{ const x=new URL(u); return x.protocol==='https:' && /(^|\.)roblox\.com$/.test(x.hostname) || /(^|\.)rbxcdn\.com$/.test(x.hostname);}catch{return false} }
+
+      // URL helpers
+      function allowed(u){ try{ const x=new URL(u); return x.protocol==='https:' && (/(^|\.)roblox\.com$/.test(x.hostname) || /(^|\.)rbxcdn\.com$/.test(x.hostname)); }catch{return false} }
       function dest(v){ const q=(v||'').trim(); if(!q) return HOME; if(/^https?:/i.test(q)) return q; return 'https://www.roblox.com/discover/?Keyword='+encodeURIComponent(q); }
       function getMode(){ return localStorage.getItem('roblox-mode') || 'turbo'; }
       function proxied(u){
@@ -288,24 +230,143 @@
         return u;
       }
       function load(u){
-        if(!allowed(u)){ statusEl.textContent='Solo se permite *.roblox.com'; return; }
+        if(!allowed(u)){ if(statusEl) statusEl.textContent='Solo se permite *.roblox.com'; return; }
         const finalUrl=proxied(u);
-        splash.style.display='none';
-        frameWrap.classList.add('active');
-        frame.src=finalUrl;
-        urlInput.value=u;
-        statusEl.textContent='Cargando '+u;
+        console.log('[Murcia] load', u, '->', finalUrl);
+        if(splash) splash.style.display='none';
+        if(frameWrap) frameWrap.classList.add('active');
+        if(frame) frame.src=finalUrl;
+        if(urlInput) urlInput.value=u;
+        if(statusEl) statusEl.textContent='Cargando '+u;
         document.querySelectorAll('.rail button[data-url]').forEach(b=>b.classList.toggle('active', b.getAttribute('data-url')===u));
-        if((getMode()==='turbo'||getMode()==='wisp') && window.WispMurcia && !window.WispMurcia.isConnected){ window.WispMurcia.connectFastest(); }
+        document.querySelectorAll('.card[data-url]').forEach(b=>b.classList.toggle('active', b.getAttribute('data-url')===u));
       }
-      $('launch').onclick=()=>load(HOME);
-      $('home-btn').onclick=()=>{
-        frameWrap.classList.remove('active'); frame.removeAttribute('src'); splash.style.display='block';
-        statusEl.textContent='Inicio'; document.querySelectorAll('.rail button[data-url]').forEach(b=>b.classList.remove('active'));
-      };
-      document.querySelectorAll('[data-url]').forEach(el=>el.addEventListener('click',e=>{ e.preventDefault(); load(el.getAttribute('data-url')); }));
-      $('go-form').onsubmit=e=>{ e.preventDefault(); load(dest(urlInput.value)); };
-      frame.addEventListener('load',()=>{ if(frameWrap.classList.contains('active')) statusEl.textContent='Sesión activa · '+new Date().toLocaleTimeString('es-ES'); });
+
+      // UI events - fixed and working
+      gid('launch').addEventListener('click', ()=> load(HOME));
+      gid('explore-btn').addEventListener('click', ()=> load('https://www.roblox.com/discover'));
+      gid('home-btn').addEventListener('click', ()=>{
+        if(frameWrap) frameWrap.classList.remove('active');
+        if(frame) frame.removeAttribute('src');
+        if(splash) splash.style.display='block';
+        if(statusEl) statusEl.textContent='Inicio';
+        document.querySelectorAll('.rail button[data-url]').forEach(b=>b.classList.remove('active'));
+        document.querySelectorAll('.card').forEach(b=>b.classList.remove('active'));
+      });
+      document.querySelectorAll('[data-url]').forEach(el=>{
+        el.addEventListener('click', (e)=>{
+          e.preventDefault();
+          const u=el.getAttribute('data-url');
+          if(u) load(u);
+        });
+      });
+      gid('go-form').addEventListener('submit', e=>{ e.preventDefault(); load(dest(urlInput.value)); });
+      if(frame) frame.addEventListener('load', ()=>{ if(frameWrap.classList.contains('active') && statusEl) statusEl.textContent='Sesión activa · '+new Date().toLocaleTimeString('es-ES'); });
+
+      // Settings modal
+      gid('settings-btn').addEventListener('click', ()=> gid('settings-modal').classList.add('open'));
+      gid('close-settings').addEventListener('click', ()=> gid('settings-modal').classList.remove('open'));
+      gid('settings-modal').addEventListener('click', e=>{ if(e.target.id==='settings-modal') e.target.classList.remove('open'); });
+
+      // Mode select
+      modeSelect.value = getMode();
+      modeSelect.addEventListener('change', ()=>{
+        localStorage.setItem('roblox-mode', modeSelect.value);
+        if(statusEl) statusEl.textContent=`Modo ${modeSelect.value} activado`;
+      });
+
+      // WISP logic with autoconnect
+      async function initWisp(){
+        try{
+          wispText.textContent='WISP Murcia · Cargando servidores...';
+          const servers = await WispMurcia.init();
+          if(!servers || servers.length===0){
+            wispText.textContent='WISP Murcia · Sin servidores';
+            settingsStatus.textContent='No se pudieron cargar servidores. Usando local.';
+            return;
+          }
+
+          // Render server list
+          serverListEl.innerHTML = servers.map(s=>`
+            <div class="srv ${s.id==='local'?'active':''}" data-url="${s.url}" data-id="${s.id}">
+              <div><div class="name">${s.name}</div><div class="meta2">${s.region} · ${s.country}${s.distanceFromMurcia?` · ${Math.round(s.distanceFromMurcia)}km de Murcia`:''}</div></div>
+              <div class="ping" id="ping-${s.id}">${s.ping? s.ping+'ms':'—'}</div>
+            </div>
+          `).join('');
+
+          serverListEl.querySelectorAll('.srv').forEach(el=>{
+            el.addEventListener('click', ()=>{
+              const url=el.dataset.url;
+              const id=el.dataset.id;
+              const srv=servers.find(x=>x.id===id);
+              serverListEl.querySelectorAll('.srv').forEach(e=>e.classList.remove('active'));
+              el.classList.add('active');
+              WispMurcia.connect(url,srv);
+            });
+          });
+
+          // Murcia status
+          try{
+            const st = await WispMurcia.getMurciaStatus();
+            if(st){
+              settingsStatus.textContent = `Región: Murcia, España · Latencia Roblox: ${st.performance?.robloxLatency||'—'}ms · Uptime: ${st.performance?.server?.uptime||0}s · DNS: ${st.murcia?.isp?.dns?.slice(0,2).join(', ')||'1.1.1.1, 8.8.8.8'}`;
+            }
+          }catch{}
+
+          // AUTOCONNECT - lo más importante para Murcia
+          wispText.textContent='WISP Murcia · Autoconectando al más rápido...';
+          console.log('[Murcia] Autoconnect iniciado...');
+          setTimeout(async ()=>{
+            const ok = await WispMurcia.connectFastest();
+            if(!ok){
+              // Fallback a local
+              console.log('[Murcia] Autoconnect fallback a local');
+              await WispMurcia.connect(servers[0].url, servers[0]);
+            }
+          }, 800);
+
+        }catch(e){
+          console.error('[Murcia] initWisp error', e);
+          wispText.textContent='WISP Murcia · Error, reintentando...';
+          setTimeout(initWisp, 2000);
+        }
+      }
+
+      WispMurcia.onStatusChange(s=>{
+        const on = s.connected;
+        if(wispDot) wispDot.className = 'dot ' + (on ? 'on' : 'warn');
+        if(wispText) wispText.textContent = on ? `WISP Murcia · ${s.server?.name||'Conectado'}` : 'WISP Murcia · Desconectado';
+        if(wispLatency) wispLatency.textContent = on && s.latency!==-1 ? `${s.latency}ms` : '';
+        if(wispAction) wispAction.textContent = on ? 'Desconectar' : 'Conectar';
+        if(metaDetail) metaDetail.textContent = on ? `${s.server?.name||''} · ${s.latency}ms · Autoconnect ON` : 'Autoconectando...';
+        if(statusEl && on) statusEl.textContent = `WISP conectado · ${s.server?.name} · ${s.latency}ms · Murcia`;
+        const pingEl = document.getElementById(`ping-${s.server?.id}`);
+        if(pingEl && on){ pingEl.textContent = s.latency+'ms'; pingEl.classList.add('ok'); }
+      });
+
+      gid('wisp-action').addEventListener('click', ()=>{
+        if(WispMurcia.isConnected) WispMurcia.disconnect();
+        else WispMurcia.connectFastest();
+      });
+      gid('btn-test').addEventListener('click', ()=> WispMurcia.testAllServers());
+      gid('btn-auto').addEventListener('click', ()=> WispMurcia.connectFastest());
+
+      // Iniciar WISP autoconnect al cargar
+      if(document.readyState==='loading'){
+        document.addEventListener('DOMContentLoaded', initWisp);
+      }else{
+        initWisp();
+      }
+
+      // También reintentar autoconnect cada 10s si no conectado (para robustez)
+      setInterval(()=>{
+        if(!WispMurcia.isConnected){
+          console.log('[Murcia] Reintentando autoconnect...');
+          WispMurcia.connectFastest();
+        }
+      }, 15000);
+
+      console.log('[Murcia] IWA formal + WISP autoconnect listo');
     </script>
   </body>
 </html>
