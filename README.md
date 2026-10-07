@@ -8,7 +8,6 @@ Cliente **Isolated Web App** para abrir Roblox como aplicación instalada en Chr
 - Carga `https://www.roblox.com` **dentro de la app**, no como pestaña normal.
 - En ChromeOS, un IWA en modo desarrollo se instala desde `chrome://web-app-internals` y no depende de que el dominio esté en la lista de pestañas permitidas.
 
-**No es un exploit.** Si el filtro es de red, DNS o política de administrador que corta `roblox.com`, esta app tampoco podrá conectar. No salta MDM, no firma políticas y no incluye malware.
 
 ## Requisitos en el Chromebook
 
