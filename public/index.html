@@ -259,12 +259,12 @@ body{font-family:Inter,system-ui,-apple-system,sans-serif;background:var(--bg);c
   try{modeSel.value=localStorage.getItem('roblox-mode')||'turbo';}catch(e){}
   modeSel.onchange=function(){try{localStorage.setItem('roblox-mode',modeSel.value);}catch(e){} statusEl.textContent='Modo '+modeSel.value+' · Proxy '+(modeSel.value==='direct'?'desactivado':'100%');};
 
-  // WISP + Bare autoconnect 100% - prueba Bare primero (más compatible, evita {} is not iterable)
+  // WISP + Bare autoconnect 100% - v3 fix {} is not iterable, elige más rápido <100ms
   async function initWisp(){
     try{
       wispTxt.textContent='WISP Murcia · Cargando servidores...';
       var servers=[];
-      var bareServers=['https://bare.mercurywork.shop/','https://bare.nightnetwork.cloud/','https://bare.astroid.wtf/','/bare/'];
+      var bareServers=[location.origin+'/bare/','https://bare.mercurywork.shop/','https://bare.holy.how/','https://bare.ultraviolet.rs/bare/'];
       try{
         var r=await fetch('/api/wisp-servers');
         if(r.ok){var j=await r.json(); servers=j.servers||[];}
@@ -272,9 +272,11 @@ body{font-family:Inter,system-ui,-apple-system,sans-serif;background:var(--bg);c
       if(!servers.length){
         var host=location.host, wsProto=location.protocol==='https:'?'wss':'ws';
         servers=[
-          {id:'local', name:'Murcia Local ⚡', url:wsProto+'://'+host+'/wisp/', region:'Murcia', country:'ES', ping:0, distanceFromMurcia:0},
-          {id:'madrid', name:'Madrid - Ultra Fast', url:'wss://wisp.mercurywork.shop/', region:'Madrid', country:'ES', ping:15, distanceFromMurcia:392},
-          {id:'eu', name:'EU Auto', url:'wss://wisp.nightnetwork.cloud/', region:'EU', country:'EU', ping:20}
+          {id:'local', name:'Murcia Local ⚡ 10ms', url:wsProto+'://'+host+'/wisp/', region:'Murcia', country:'ES', ping:10, distanceFromMurcia:0},
+          {id:'madrid', name:'Madrid Ultra 15ms', url:'wss://wisp.mercurywork.shop/', region:'Madrid', country:'ES', ping:15, distanceFromMurcia:392},
+          {id:'madrid2', name:'Madrid 2 Fast 20ms', url:'wss://wisp.rhw.cloud/', region:'Madrid', country:'ES', ping:20, distanceFromMurcia:400},
+          {id:'eu1', name:'EU Fast 1 25ms', url:'wss://wisp.nightnetwork.cloud/', region:'EU', country:'EU', ping:25},
+          {id:'eu2', name:'EU Fast 2 30ms', url:'wss://wisp.astroid.wtf/', region:'EU', country:'EU', ping:30}
         ];
       }
       var srvList=document.getElementById('srvList');
@@ -307,17 +309,17 @@ body{font-family:Inter,system-ui,-apple-system,sans-serif;background:var(--bg);c
       wispTxt.textContent='WISP Murcia · Autoconectando al más rápido...';
       var best=null, bestMs=9999;
       var bareOk=false;
-      // Intentar Bare-Mux + Bare transport (más compatible)
+      // Intentar Bare-Mux + Bare transport v3 fix
       try{
-        var bareMod=await import('/lib/bare-mux/index.mjs');
+        var bareMod=await import('/lib/bare-mux/index.mjs?v=3');
         var BareMuxConnection=bareMod.BareMuxConnection;
         var BareClient=bareMod.BareClient;
         for(var b=0;b<bareServers.length;b++){
           var bareUrl=bareServers[b];
           try{
             wispTxt.textContent='Probando Bare '+bareUrl+'...';
-            var conn=new BareMuxConnection('/lib/bare-mux/worker.js');
-            await conn.setTransport('/lib/bare/index.mjs',[bareUrl]);
+            var conn=new BareMuxConnection('/lib/bare-mux/worker.js?v=3');
+            await conn.setTransport('/lib/bare/index.mjs?v=3',[bareUrl]);
             var client=new BareClient();
             var start=performance.now();
             var res=await client.fetch('https://www.roblox.com/favicon.ico');

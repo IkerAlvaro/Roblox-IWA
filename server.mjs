@@ -481,32 +481,34 @@ function setProg(p){ if(progEl) progEl.style.width = p+'%'; }
 function setStatus(s){ if(statusEl) statusEl.textContent = s; }
 
 const WISP_SERVERS = [
-  {name:'Murcia Local', url: (location.protocol==='https:'?'wss':'ws')+'://'+location.host+'/wisp/'},
-  {name:'Madrid', url:'wss://wisp.mercurywork.shop/'},
-  {name:'EU 1', url:'wss://wisp.nightnetwork.cloud/'},
-  {name:'EU 2', url:'wss://wisp.astroid.wtf/'},
-  {name:'EU 3', url:'wss://wisp.rhw.cloud/'}
+  {name:'Murcia Local ⚡', url: (location.protocol==='https:'?'wss':'ws')+'://'+location.host+'/wisp/'},
+  {name:'Madrid Ultra', url:'wss://wisp.mercurywork.shop/'},
+  {name:'Madrid 2', url:'wss://wisp.rhw.cloud/'},
+  {name:'EU Fast 1', url:'wss://wisp.nightnetwork.cloud/'},
+  {name:'EU Fast 2', url:'wss://wisp.astroid.wtf/'},
+  {name:'EU Fast 3', url:'wss://wisp.ultraviolet.rs/'},
+  {name:'US East', url:'wss://wisp.mercurywork.shop/'}
 ];
 
 const BARE_SERVERS = [
   'https://bare.mercurywork.shop/',
   'https://bare.nightnetwork.cloud/',
-  'https://bare.astroid.wtf/',
-  'https://bare.rhw.cloud/',
-  '/bare/'
+  'https://bare.holy.how/',
+  'https://bare.ultraviolet.rs/bare/',
+  (location.origin + '/bare/')
 ];
 
 async function tryWisp(){
   setProg(10);
   log('Probando WISP Murcia optimizado...');
   
-  // Cargar bare-mux si existe
+  // Cargar bare-mux si existe - v3 fix {} is not iterable
   let BareMuxConnection, BareClient;
   try{
-    const mod = await import('/lib/bare-mux/index.mjs');
+    const mod = await import('/lib/bare-mux/index.mjs?v=3');
     BareMuxConnection = mod.BareMuxConnection;
     BareClient = mod.BareClient;
-    log('Bare-Mux cargado OK');
+    log('Bare-Mux cargado OK v3 fixed');
   }catch(e){
     log('Bare-Mux no disponible, usando fetch directo: '+e.message);
     // Fallback a fetch directo del navegador (funciona en preview porque el navegador sí tiene internet)
@@ -537,9 +539,9 @@ async function tryWisp(){
     log('Probando Bare: '+bareUrl);
     setProg(25 + (i/BARE_SERVERS.length)*20);
     try{
-      const conn = new BareMuxConnection('/lib/bare-mux/worker.js');
+      const conn = new BareMuxConnection('/lib/bare-mux/worker.js?v=3');
       log('Set transport Bare: '+bareUrl);
-      await conn.setTransport('/lib/bare/index.mjs', [bareUrl]);
+      await conn.setTransport('/lib/bare/index.mjs?v=3', [bareUrl]);
       log('Bare transport OK');
       const client = new BareClient();
       setStatus('Trayendo '+targetUrl+' via Bare '+bareUrl+'...');
@@ -570,17 +572,17 @@ async function tryWisp(){
   }
 
   setProg(50);
-  // 2. Intentar con Epoxy + WISP (si Bare falla)
+  // 2. Intentar con Epoxy + WISP (si Bare falla) - v3 fix headers
   for(let i=0;i<WISP_SERVERS.length;i++){
     const srv = WISP_SERVERS[i];
-    setStatus('Probando '+srv.name+' ('+srv.url+')...');
+    setStatus('Probando '+srv.name+' ('+srv.url+')... p'+(i+1));
     log('Probando WISP '+srv.name+': '+srv.url);
     setProg(50 + (i/WISP_SERVERS.length)*40);
     
     try{
-      const conn = new BareMuxConnection('/lib/bare-mux/worker.js');
-      log('Conectando a '+srv.url+' via Epoxy...');
-      await conn.setTransport('/lib/epoxy/index.mjs', [{wisp: srv.url}]);
+      const conn = new BareMuxConnection('/lib/bare-mux/worker.js?v=3');
+      log('Conectando a '+srv.url+' via Epoxy v3...');
+      await conn.setTransport('/lib/epoxy/index.mjs?v=3', [{wisp: srv.url}]);
       log('Epoxy OK con '+srv.name);
       
       const client = new BareClient();
@@ -739,9 +741,10 @@ tryWisp();
       const ext = path.extname(filePath).toLowerCase();
       const contentType = types[ext] || "application/octet-stream";
       
-      // Cache optimizado: assets estáticos 1 hora, html 60s
+      // Cache optimizado: lib files no-cache para fix {} is not iterable, resto 1h
+      const isLib = filePath.includes('/lib/');
       const isStatic = [".js", ".mjs", ".css", ".png", ".jpg", ".wasm"].includes(ext);
-      const cacheControl = isStatic ? "public, max-age=3600" : "public, max-age=60";
+      const cacheControl = isLib ? "no-cache, no-store, must-revalidate" : (isStatic ? "public, max-age=3600" : "public, max-age=60");
 
       res.writeHead(200, {
         "Content-Type": contentType,
