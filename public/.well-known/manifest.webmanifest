@@ -1,0 +1,30 @@
+{
+  "id": "/",
+  "name": "Aula Virtual",
+  "short_name": "Aula",
+  "description": "Portal educativo - Recursos, herramientas de estudio y acceso a contenidos. Optimizado para Murcia.",
+  "version": "2.0.1",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#16a34a",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "permissions_policy": {
+    "cross-origin-isolated": ["self"]
+  },
+  "isolated_storage": true
+}
